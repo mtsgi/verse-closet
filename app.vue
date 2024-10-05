@@ -19,7 +19,7 @@ request.addEventListener('upgradeneeded', (event) => {
   const objectStore = db.createObjectStore('items', { keyPath: 'name' })
   objectStore.createIndex('name', 'name', { unique: true })
   // objectStoreの作成が完了した時
-  objectStore.transaction.addEventListener('complete', (event) => {
+  objectStore.transaction.addEventListener('complete', () => {
     console.log('IDBTransaction complete')
   })
 })
@@ -27,30 +27,44 @@ request.addEventListener('upgradeneeded', (event) => {
 /** allItemsを更新する */
 const updateItems = () => {
   const db = database.value.db
-  if (!db) { return }
+  if (!db) {
+    return
+  }
   const transaction = db.transaction(['items'], 'readonly')
   const objectStore = transaction.objectStore('items')
   const request = objectStore.getAll()
-  request.addEventListener('success', (event: any) => {
-    database.value.allItems = event.target?.result
+  request.addEventListener('success', (event) => {
+    // @ts-expect-error event.target.result => IDBRequest.result
+    database.value.allItems = event.target?.result || []
   })
 }
 </script>
 
 <template>
-  <AppHeader />
+  <UApp>
+    <AppHeader />
 
-  <div v-if="database.db === null">
-    Loading...
-  </div>
+    <USeparator icon="i-ph-diamond" />
 
-  <RegisterForm
-    v-if="database.db"
-    :db="database.db"
-    @register="updateItems"
-  />
+    <div v-if="database.db === null">
+      Loading...
+    </div>
 
-  <ItemList
-    @delete="updateItems"
-  />
+    <RegisterForm
+      v-if="database.db"
+      :db="database.db"
+      @register="updateItems"
+    />
+
+    <USeparator icon="i-ph-diamond" />
+
+    <ItemList
+      @delete="updateItems"
+    />
+  </UApp>
 </template>
+
+<style>
+@import "tailwindcss";
+@import "@nuxt/ui";
+</style>
