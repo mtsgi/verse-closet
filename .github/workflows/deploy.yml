@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: "20"
       - run: npm install
-      - run: NUXT_APP_BASE_URL=/verse-closet/ npx nuxt build --preset github_pages
+      - run: NUXT_APP_BASE_URL=/verse-closet/ NUXT_BRAND_NAME_LIST="${{ github.env.NUXT_BRAND_NAME_LIST }}" NUXT_CARD_POOL_LIST="${{ github.env.NUXT_CARD_POOL_LIST }}" npx nuxt build --preset github_pages
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
