@@ -9,10 +9,10 @@ const database = useDatabase()
 
 <template>
   <div class="item-list">
-    <ItemDetail
-      v-for="item in database.allItems"
-      :key="item.name"
-      :item="item"
+    <CoordinateDetail
+      v-for="coordinate in database.allCoordinates"
+      :key="coordinate.name"
+      :coordinate="coordinate"
       @delete="emit('delete')"
       @error="emit('error')"
     />
@@ -23,7 +23,7 @@ const database = useDatabase()
 .item-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.5rem;
+  gap: 1rem;
+  padding: 1rem;
 }
 </style>
