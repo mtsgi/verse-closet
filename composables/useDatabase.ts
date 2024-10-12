@@ -10,7 +10,7 @@ export interface VerseCoordinate {
   /** タグ（検索用） */
   tags: string[]
   /** カードプール */
-  pool?: string
+  pool: string[]
   /** 画像ファイル */
   file?: File
   /** このコーデが含むパーツの種類 */

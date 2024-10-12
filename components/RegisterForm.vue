@@ -19,6 +19,7 @@ const defaultCoordinate: VerseCoordinate = {
   rarity: 1,
   brandName: '',
   tags: [],
+  pool: [],
   itemType: ['tops', 'bottoms', 'shoes', 'accessory'],
   items: {
     tops: { ...defaultItemState },
@@ -51,6 +52,7 @@ const addItem = () => {
   const item: VerseCoordinate = {
     ...form.value,
     tags: [...form.value.tags],
+    pool: [...form.value.pool],
     itemType: [...coordinateItemTypes.value],
     items: {
       tops: { ...form.value.items.tops },
@@ -96,10 +98,11 @@ const addItem = () => {
     />
 
     <label>バージョン</label>
-    <USelect
+    <UInputMenu
       v-model="form.pool"
       size="xl"
       :items="runtimeConfig.public.cardPoolList"
+      multiple
     />
 
     <label>レアリティ</label>
@@ -130,6 +133,7 @@ const addItem = () => {
     <label>タイプ</label>
     <URadioGroup
       v-model="formSeparate"
+      orientation="horizontal"
       size="xl"
       :items="[
         {
@@ -154,14 +158,21 @@ const addItem = () => {
         :label="itemType"
         :model-value="form.items[itemType].number > 0"
         @update:model-value="(value) => form.items[itemType].number = value ? 1 : 0"
-      />
+      >
+        <template #label>
+          <CoordinateItemIcon
+            :type="itemType"
+            :number="form.items[itemType].number"
+            label
+          />
+        </template>
+      </UCheckbox>
     </div>
 
     <div class="buttons">
       <UButton
         size="xl"
         class="font-bold rounded-full"
-        color="pink"
         @click="addItem"
       >
         追加する
@@ -169,6 +180,7 @@ const addItem = () => {
       <UButton
         size="xl"
         class="font-bold rounded-full"
+        variant="outline"
         @click="emit('register')"
       >
         とじる
@@ -183,8 +195,8 @@ const addItem = () => {
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.5rem;
-  max-height: 90vh;
-  overflow: auto;
+  // max-height: 90vh;
+  // overflow: auto;
 
   .form-file {
     border-color: var(--color-gray-300);

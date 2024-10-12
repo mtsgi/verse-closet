@@ -4,6 +4,8 @@ const props = defineProps<{
   type: CoordinateItemType
   /** 所持数 */
   number: number
+  /** ラベルを表示するか？ */
+  label?: boolean
 }>()
 
 const iconName = computed(() => {
@@ -22,21 +24,53 @@ const iconName = computed(() => {
       return 'q'
   }
 })
+
+const labelText = computed(() => {
+  switch (props.type) {
+    case 'tops':
+      return 'トップス'
+    case 'bottoms':
+      return 'ボトムス'
+    case 'onepiece':
+      return 'ワンピース'
+    case 'shoes':
+      return 'シューズ'
+    case 'accessory':
+      return 'アクセ'
+    default:
+      return ''
+  }
+})
 </script>
 
 <template>
-  <div
-    class="item"
-    :class="{
-      [`--${props.type}`]: true,
-      '--active': props.number > 0,
-    }"
-  >
-    <UIcon :name="iconName" />
+  <div class="item-wrapper">
+    <div
+      class="item"
+      :class="{
+        [`--${props.type}`]: true,
+        '--active': props.number > 0,
+      }"
+    >
+      <UIcon :name="iconName" />
+    </div>
+
+    <span
+      v-if="props.label"
+      class="label"
+    >
+      {{ labelText }}
+    </span>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.item-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .item {
   font-size: 1rem;
   display: flex;

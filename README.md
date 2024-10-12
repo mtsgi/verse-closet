@@ -1,10 +1,10 @@
 # Verse Closet
 
-![example workflow](https://github.com/mtsgi/verse-closet/actions/workflows/deploy.yml/badge.svg)
+![Deploy workflow](https://github.com/mtsgi/verse-closet/actions/workflows/deploy.yml/badge.svg)
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+## 開発
 
-## Setup
+### Setup
 
 パッケージをインストールします
 
@@ -12,7 +12,7 @@ Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introdu
 npm install
 ```
 
-## Development Server
+### Development Server
 
 `http://localhost:3000` で開発サーバーが起動します
 
@@ -20,7 +20,7 @@ npm install
 npm run dev -- --host
 ```
 
-## Production
+### Production
 
 GitHub Pagesでホスティング可能なSPAとしてビルドします
 

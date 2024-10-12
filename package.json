@@ -1,6 +1,7 @@
 {
   "name": "verse-closet",
   "type": "module",
+  "version": "0.1.0",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",

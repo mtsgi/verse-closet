@@ -3,23 +3,34 @@ const emit = defineEmits<{
   (e: 'register'): void
 }>()
 
+/** 設定画面の表示状態 */
+const openSetting = ref<boolean>(false)
 /** 追加フォームの表示状態 */
-const openDrawer = ref<boolean>(false)
+const openForm = ref<boolean>(false)
 
 const onRegister = () => {
   emit('register')
-  openDrawer.value = false
+  openForm.value = false
 }
 </script>
 
 <template>
   <header>
-    <UButton
-      icon="solar:settings-minimalistic-linear"
-      size="xl"
-      color="gray"
-      variant="ghost"
-    />
+    <UDrawer
+      v-model:open="openSetting"
+      title="せってい"
+    >
+      <UButton
+        icon="solar:settings-minimalistic-linear"
+        size="xl"
+        color="neutral"
+        variant="ghost"
+      />
+
+      <template #body>
+        <AppSetting />
+      </template>
+    </UDrawer>
 
     <div class="divider" />
 
@@ -32,18 +43,17 @@ const onRegister = () => {
     <div class="divider" />
 
     <UDrawer
-      v-model:open="openDrawer"
-      title="Drawer with footer"
-      description="This is useful when you want a form in a Drawer."
+      v-model:open="openForm"
+      title="コーデとうろく"
     >
       <UButton
         icon="solar:add-square-linear"
         size="xl"
-        color="gray"
+        color="neutral"
         variant="ghost"
       />
 
-      <template #content>
+      <template #body>
         <RegisterForm
           @register="onRegister"
         />

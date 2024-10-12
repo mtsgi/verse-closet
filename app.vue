@@ -59,6 +59,10 @@ const updateItems = () => {
       Loading...
     </div>
 
+    <div v-else-if="database.allCoordinates.length === 0">
+      右上の<UIcon name="solar:add-square-linear" />からコーデをとうろくしてね
+    </div>
+
     <CoordinateList
       @delete="updateItems"
     />
@@ -77,8 +81,23 @@ const updateItems = () => {
   --vc-cyan-light: #b3ecff;
 
   color: #444;
-  background: url('bg_texture.png'), linear-gradient(45deg, #ffcde6, #dbffff, #ffffd9);
+  background-color: transparent;
+  background: linear-gradient(45deg, #ffcde6, #dbffff, #ffffd9);
   background-size: 100%;
   background-attachment: fixed;
+}
+
+body {
+  font-family: unset;
+  background-color: transparent;
+  min-height: 100dvh;
+  background: url('/verse-closet/bg_texture.png');
+  background-size: 20rem 10rem;
+  animation: bgtexture 30s infinite linear;
+}
+
+@keyframes bgtexture {
+  from { background-position: 0 0; }
+  to { background-position: 20rem 10rem; }
 }
 </style>

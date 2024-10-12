@@ -72,7 +72,7 @@ const imageURL = computed(() => {
           :number="props.coordinate.items[type].number"
         />
       </div>
-      {{ props.coordinate.pool }}
+      {{ props.coordinate.pool.join(", ") }}
     </div>
 
     <CoordinateModal
