@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const emit = defineEmits<{
-  (e: 'delete'): void
+  (e: 'update-items'): void
   (e: 'error'): void
 }>()
 
@@ -13,7 +13,7 @@ const database = useDatabase()
       v-for="coordinate in database.allCoordinates"
       :key="coordinate.name"
       :coordinate="coordinate"
-      @delete="emit('delete')"
+      @update-items="emit('update-items')"
       @error="emit('error')"
     />
   </div>

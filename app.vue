@@ -1,13 +1,4 @@
 <script setup lang="ts">
-useSeoMeta({
-  title: 'Verse Closet',
-  ogTitle: 'Verse Closet',
-  description: 'コーデアイテムかんりツール「Verse Closet」',
-  ogDescription: 'コーデアイテムかんりツール「Verse Closet」',
-  ogImage: 'icon.png',
-  twitterCard: 'summary',
-})
-
 const runtimeConfig = useRuntimeConfig()
 const database = useDatabase()
 
@@ -50,9 +41,11 @@ const updateItems = () => {
 </script>
 
 <template>
+  <NuxtPwaManifest />
+
   <UApp>
     <AppHeader
-      @register="updateItems"
+      @update-items="updateItems"
     />
 
     <div v-if="database.db === null">
@@ -64,7 +57,7 @@ const updateItems = () => {
     </div>
 
     <CoordinateList
-      @delete="updateItems"
+      @update-items="updateItems"
     />
   </UApp>
 </template>
@@ -92,12 +85,12 @@ body {
   background-color: transparent;
   min-height: 100dvh;
   background: url('/verse-closet/bg_texture.png');
-  background-size: 20rem 10rem;
+  background-size: 20rem 8rem;
   animation: bgtexture 30s infinite linear;
 }
 
 @keyframes bgtexture {
   from { background-position: 0 0; }
-  to { background-position: 20rem 10rem; }
+  to { background-position: 20rem 8rem; }
 }
 </style>

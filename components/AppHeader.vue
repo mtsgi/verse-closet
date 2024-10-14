@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 const emit = defineEmits<{
-  (e: 'register'): void
+  (e: 'update-items'): void
 }>()
 
 /** 設定画面の表示状態 */
@@ -9,7 +9,7 @@ const openSetting = ref<boolean>(false)
 const openForm = ref<boolean>(false)
 
 const onRegister = () => {
-  emit('register')
+  emit('update-items')
   openForm.value = false
 }
 </script>

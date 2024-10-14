@@ -2,7 +2,7 @@ export default defineAppConfig({
   ui: {
     colors: {
       primary: 'cyan',
-      gray: 'zinc',
+      neutral: 'zinc',
     },
     inputMenu: {
       slots: {
@@ -12,11 +12,6 @@ export default defineAppConfig({
     select: {
       slots: {
         content: 'z-150',
-      },
-    },
-    button: {
-      slots: {
-        base: ['justify-center'],
       },
     },
   },

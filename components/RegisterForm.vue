@@ -170,21 +170,21 @@ const addItem = () => {
     </div>
 
     <div class="buttons">
-      <UButton
+      <VerseButton
         size="xl"
         class="font-bold rounded-full"
         @click="addItem"
       >
         追加する
-      </UButton>
-      <UButton
+      </VerseButton>
+      <VerseButton
         size="xl"
         class="font-bold rounded-full"
         variant="outline"
         @click="emit('register')"
       >
         とじる
-      </UButton>
+      </VerseButton>
     </div>
   </div>
 </template>

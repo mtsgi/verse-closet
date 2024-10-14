@@ -4,16 +4,11 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'delete'): void
+  (e: 'update-items'): void
   (e: 'error'): void
 }>()
 
 const modalOpen = ref<boolean>(false)
-
-const onDelete = () => {
-  emit('delete')
-  modalOpen.value = false
-}
 
 const imageURL = computed(() => {
   if (props.coordinate.file) {
@@ -78,7 +73,8 @@ const imageURL = computed(() => {
     <CoordinateModal
       v-model="modalOpen"
       :coordinate="coordinate"
-      @delete="onDelete"
+      @close-modal="modalOpen = false"
+      @update-items="emit('update-items')"
       @error="emit('error')"
     />
   </div>
