@@ -9,32 +9,35 @@ const emit = defineEmits<{
 
 const toast = useToast()
 
-const defaultItemState: CoordinateItemState = {
+const defaultItemState: CoordinateItemState<'tops'> = {
+  type: 'tops',
   number: 0,
   bp: 0,
   id: '',
+  name: '',
 }
 const defaultCoordinate: VerseCoordinate = {
   name: '',
   rarity: 1,
   brandName: '',
-  tags: [],
   pool: [],
   itemType: ['tops', 'bottoms', 'shoes', 'accessory'],
   items: {
-    tops: { ...defaultItemState },
-    bottoms: { ...defaultItemState },
-    onepiece: { ...defaultItemState },
-    shoes: { ...defaultItemState },
-    accessory: { ...defaultItemState },
+    tops: { ...defaultItemState, type: 'tops' },
+    bottoms: { ...defaultItemState, type: 'bottoms' },
+    onepiece: { ...defaultItemState, type: 'onepiece' },
+    shoes: { ...defaultItemState, type: 'shoes' },
+    accessory: { ...defaultItemState, type: 'accessory' },
   },
+  tags: [],
+  memo: '',
 }
 
 const form = ref<VerseCoordinate>({ ...defaultCoordinate })
 const formSeparate = ref<'true' | 'false'>('true')
 const formFile = useTemplateRef<HTMLInputElement>('formFile')
 
-/** コーデのタイプによって存在するアイテム種別を返す */
+/** コーデのセパレートタイプによって存在するアイテム種別を返す */
 const coordinateItemTypes = computed<CoordinateItemType[]>(() => {
   if (formSeparate.value === 'true') {
     return ['tops', 'bottoms', 'shoes', 'accessory']
@@ -42,6 +45,17 @@ const coordinateItemTypes = computed<CoordinateItemType[]>(() => {
   else {
     return ['onepiece', 'shoes', 'accessory']
   }
+})
+
+/** セパレートタイプ切り替え時に存在しないアイテムの所持数を0にする */
+watch(coordinateItemTypes, (value) => {
+  console.log('新しいitemtypes', value)
+  const itemTypes = Object.keys(form.value.items) as CoordinateItemType[]
+  itemTypes.forEach((itemType) => {
+    if (!value.includes(itemType)) {
+      form.value.items[itemType].number = 0
+    }
+  })
 })
 
 const addItem = () => {
@@ -168,6 +182,13 @@ const addItem = () => {
         </template>
       </UCheckbox>
     </div>
+
+    <label>メモ</label>
+    <UTextarea
+      v-model="form.memo"
+      :rows="2"
+      autoresize
+    />
 
     <div class="buttons">
       <VerseButton

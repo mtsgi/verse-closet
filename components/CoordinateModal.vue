@@ -77,22 +77,50 @@ const deleteItem = (key: string) => {
 <template>
   <UModal
     :open="props.modelValue"
-    title="コーデの詳細"
+    :title="props.coordinate.name"
     :close="true"
     class="coordinate-modal"
     @update:open="value => emit('update:modelValue', value)"
   >
+    <template #title>
+      <div class="coordinate-rarity">
+        <img
+          v-for="i in props.coordinate.rarity"
+          :key="`item-detail-rarity-star-${i}`"
+          src="/star_icon.png"
+          alt="★"
+        >
+      </div>
+      {{ props.coordinate.name }}
+    </template>
     <template #body>
+      <div class="coordinate-badges">
+        <UBadge class="font-bold rounded-full">
+          {{ props.coordinate.brandName }}
+        </UBadge>
+        <UBadge
+          v-for="pool in props.coordinate.pool"
+          :key="`item-detail-pool-${pool}`"
+          class="font-bold rounded-full"
+          variant="outline"
+        >
+          {{ pool }}
+        </UBadge>
+      </div>
+
+      <!-- 画像 -->
       <img
         v-if="imageURL"
         :src="imageURL"
         :alt="props.coordinate.name"
+        class="coordinate-image"
       >
 
       <!-- 各コーデの所持状況更新 -->
       <div
         v-for="itemType in props.coordinate.itemType"
         :key="`coordinateModal-itemType-${itemType}`"
+        class="coordinate-item"
       >
         <UCheckbox
           size="xl"
@@ -110,30 +138,55 @@ const deleteItem = (key: string) => {
         </UCheckbox>
       </div>
 
-      <UButton
-        icon="i-heroicons-pencil"
-        size="lg"
+      <!-- メモ -->
+      <UAlert
+        class="coordinate-memo"
+        color="neutral"
         variant="soft"
-        block
-        disabled
-      >
-        編集する
-      </UButton>
+        :description="props.coordinate.memo"
+      />
 
-      <UButton
-        icon="i-heroicons-trash"
-        size="lg"
-        color="error"
-        variant="soft"
-        block
-        @click="deleteItem(props.coordinate.name)"
-      >
-        削除する
-      </UButton>
+      <div class="buttons">
+        <UButton
+          icon="i-heroicons-pencil"
+          size="lg"
+          variant="soft"
+          block
+          disabled
+        >
+          編集する
+        </UButton>
 
-      <UCard>
-        {{ props.coordinate }}
-      </UCard>
+        <UButton
+          icon="i-heroicons-trash"
+          size="lg"
+          color="error"
+          variant="soft"
+          block
+          @click="deleteItem(props.coordinate.name)"
+        >
+          削除する
+        </UButton>
+      </div>
+
+      <UCollapsible>
+        <UButton
+          label="詳細データを見る"
+          color="neutral"
+          variant="ghost"
+          trailing-icon="i-heroicons-chevron-down-20-solid"
+          :ui="{
+            trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200',
+          }"
+          block
+        />
+
+        <template #content>
+          <UCard>
+            {{ props.coordinate }}
+          </UCard>
+        </template>
+      </UCollapsible>
     </template>
   </UModal>
 </template>
@@ -142,5 +195,46 @@ const deleteItem = (key: string) => {
 .coordinate-modal {
   overflow: auto;
   max-height: 100%;
+
+  .coordinate-rarity {
+    display: inline-flex;
+    margin-right: 1rem;
+    margin-bottom: 1px;
+    vertical-align: bottom;
+
+    img {
+      flex-shrink: 0;
+      height: 1.25rem;
+      width: 1.25rem;
+      margin-right: -0.5rem;
+    }
+  }
+
+  .coordinate-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .coordinate-image {
+    border-radius: 0.5rem;
+    margin: 0 auto 1rem auto;
+    max-height: 50vh;
+  }
+
+  .coordinate-item {
+    margin-bottom: 1rem;
+  }
+
+  .coordinate-memo {
+    margin-bottom: 1rem;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
 }
 </style>

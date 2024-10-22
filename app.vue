@@ -52,9 +52,15 @@ const updateItems = () => {
       Loading...
     </div>
 
-    <div v-else-if="database.allCoordinates.length === 0">
-      右上の<UIcon name="solar:add-square-linear" />からコーデをとうろくしてね
-    </div>
+    <UAlert
+      v-else-if="database.allCoordinates.length === 0"
+      variant="outline"
+      color="neutral"
+    >
+      <template #title>
+        右上の<UIcon name="solar:add-square-linear" />からコーデをとうろくしてね
+      </template>
+    </UAlert>
 
     <CoordinateList
       @update-items="updateItems"
