@@ -25,6 +25,7 @@ const deleteDB = () => {
       :ui="{ footer: 'justify-end' }"
     >
       <UButton
+        icon="solar:trash-bin-minimalistic-2-linear"
         color="error"
         block
       >

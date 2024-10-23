@@ -126,6 +126,10 @@ const imageURL = computed(() => {
   .name {
     font-weight: bold;
     font-size: 1rem;
+    white-space: nowrap;
+    word-break: keep-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .items {

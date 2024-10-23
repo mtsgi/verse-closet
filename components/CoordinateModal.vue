@@ -111,9 +111,9 @@ const deleteItem = (key: string) => {
       <!-- 画像 -->
       <img
         v-if="imageURL"
+        class="coordinate-image"
         :src="imageURL"
         :alt="props.coordinate.name"
-        class="coordinate-image"
       >
 
       <!-- 各コーデの所持状況更新 -->
@@ -140,6 +140,7 @@ const deleteItem = (key: string) => {
 
       <!-- メモ -->
       <UAlert
+        v-if="props.coordinate.memo"
         class="coordinate-memo"
         color="neutral"
         variant="soft"
@@ -148,7 +149,7 @@ const deleteItem = (key: string) => {
 
       <div class="buttons">
         <UButton
-          icon="i-heroicons-pencil"
+          icon="solar:pen-linear"
           size="lg"
           variant="soft"
           block
@@ -158,7 +159,7 @@ const deleteItem = (key: string) => {
         </UButton>
 
         <UButton
-          icon="i-heroicons-trash"
+          icon="solar:trash-bin-minimalistic-2-linear"
           size="lg"
           color="error"
           variant="soft"
@@ -198,7 +199,8 @@ const deleteItem = (key: string) => {
 
   .coordinate-rarity {
     display: inline-flex;
-    margin-right: 1rem;
+    min-width: 1.25rem;
+    margin-right: 0.5rem;
     margin-bottom: 1px;
     vertical-align: bottom;
 
@@ -218,9 +220,10 @@ const deleteItem = (key: string) => {
   }
 
   .coordinate-image {
-    border-radius: 0.5rem;
-    margin: 0 auto 1rem auto;
+    border-radius: 0.75rem;
+    margin: 0 auto 1.5rem auto;
     max-height: 50vh;
+    box-shadow: 0 1rem 1rem -0.75rem var(--vc-cyan-light);
   }
 
   .coordinate-item {
