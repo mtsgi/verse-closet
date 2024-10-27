@@ -1,6 +1,11 @@
 # Verse Closet
 
 ![Deploy workflow](https://github.com/mtsgi/verse-closet/actions/workflows/deploy.yml/badge.svg)
+![GitHub License](https://img.shields.io/github/license/mtsgi/verse-closet)
+
+コーデアイテムかんりツール 「Verse Closet」
+
+![コーデアイテムかんりツール Verse Closet](./public/banner.png)
 
 ## 開発
 

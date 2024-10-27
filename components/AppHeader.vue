@@ -16,10 +16,7 @@ const onRegister = () => {
 
 <template>
   <header>
-    <UDrawer
-      v-model:open="openSetting"
-      title="せってい"
-    >
+    <UDrawer v-model:open="openSetting">
       <UButton
         icon="solar:settings-minimalistic-linear"
         size="xl"
@@ -67,7 +64,6 @@ header {
   display: flex;
   align-items: center;
   font-size: 1.5rem;
-  font-weight: bold;
   text-align: center;
   margin-bottom: 2rem;
   padding: 0.5rem;

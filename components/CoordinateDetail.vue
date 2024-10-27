@@ -124,7 +124,7 @@ const imageURL = computed(() => {
   }
 
   .name {
-    font-weight: bold;
+    font-weight: 600;
     font-size: 1rem;
     white-space: nowrap;
     word-break: keep-all;

@@ -1,3 +1,5 @@
+import packageJson from './package.json'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
@@ -12,8 +14,12 @@ export default defineNuxtConfig({
         { name: 'description', content: 'コーデアイテムかんりツール「Verse Closet」' },
         { property: 'og:title', content: 'Verse Closet' },
         { property: 'og:description', content: 'コーデアイテムかんりツール「Verse Closet」' },
-        { property: 'og:image', content: 'icon.png' },
-        { name: 'twitter:card', content: 'summary' },
+        { property: 'og:image', content: 'https://mtsgi.github.io/verse-closet/banner.png' },
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:title', content: 'Verse Closet' },
+        { property: 'twitter:description', content: 'コーデアイテムかんりツール「Verse Closet」' },
+        { property: 'og:image', content: 'https://mtsgi.github.io/verse-closet/banner.png' },
+        { name: 'thumbnail', content: 'https://mtsgi.github.io/verse-closet/banner.png' },
       ],
       link: [
         { rel: 'icon', href: './favicon.ico' },
@@ -28,6 +34,7 @@ export default defineNuxtConfig({
     public: {
       dbName: 'VerseCloset',
       dbVersion: 1,
+      appVersion: packageJson.version,
       // 以下は環境変数から読み込み
       brandNameList: String(import.meta.env.NUXT_BRAND_NAME_LIST || '').split(','),
       cardPoolList: String(import.meta.env.NUXT_CARD_POOL_LIST || '').split(','),

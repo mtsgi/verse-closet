@@ -18,6 +18,24 @@ const deleteDB = () => {
 
 <template>
   <div class="setting">
+    <label>バージョン情報</label>
+
+    <div>
+      バージョン {{ runtimeConfig.public.appVersion }}
+    </div>
+
+    <UButton
+      to="https://github.com/mtsgi/verse-closet"
+      target="_blank"
+      icon="mdi:github"
+      variant="outline"
+      block
+    >
+      GitHubで見る
+    </UButton>
+
+    <label>さくじょ</label>
+
     <UModal
       v-model:open="openModal"
       title="本当に削除しますか？"
@@ -37,14 +55,24 @@ const deleteDB = () => {
           label="やめる"
           color="neutral"
           variant="outline"
+          block
           @click="openModal = false"
         />
         <UButton
           label="削除する"
           color="error"
+          block
           @click="deleteDB"
         />
       </template>
     </UModal>
   </div>
 </template>
+
+<style lang="scss" scoped>
+.setting {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+</style>

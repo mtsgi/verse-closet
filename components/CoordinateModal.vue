@@ -183,8 +183,8 @@ const deleteItem = (key: string) => {
         />
 
         <template #content>
-          <UCard>
-            {{ props.coordinate }}
+          <UCard class="coordinate-detail">
+            <pre>{{ JSON.stringify(props.coordinate, null, 4) }}</pre>
           </UCard>
         </template>
       </UCollapsible>
@@ -238,6 +238,15 @@ const deleteItem = (key: string) => {
     display: flex;
     gap: 1rem;
     margin-bottom: 1rem;
+  }
+
+  .coordinate-detail {
+    background: var(--ui-bg-elevated);
+
+    pre {
+      font: inherit;
+      font-size: 0.8rem;
+    }
   }
 }
 </style>

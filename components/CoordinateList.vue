@@ -60,7 +60,20 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
       size="xl"
       icon="solar:magnifer-linear"
       placeholder="けんさくワード"
-    />
+    >
+      <template
+        v-if="formWord.length > 0"
+        #trailing
+      >
+        <UButton
+          color="neutral"
+          variant="ghost"
+          size="sm"
+          icon="solar:close-circle-linear"
+          @click="formWord = ''"
+        />
+      </template>
+    </UInput>
 
     <!-- しぼりこみ -->
     <UCollapsible>
@@ -87,6 +100,8 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
             <UButton
               icon="solar:close-circle-linear"
               variant="ghost"
+              color="neutral"
+              :disabled="formBrandName === ''"
               @click="formBrandName = ''"
             />
             <label>バージョン</label>
@@ -97,6 +112,8 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
             <UButton
               icon="solar:close-circle-linear"
               variant="ghost"
+              color="neutral"
+              :disabled="formCardPool === ''"
               @click="formCardPool = ''"
             />
             <label>レアリティ</label>
@@ -107,6 +124,8 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
             <UButton
               icon="solar:close-circle-linear"
               variant="ghost"
+              color="neutral"
+              :disabled="formRarity === null"
               @click="formRarity = null"
             />
           </div>
@@ -155,7 +174,7 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
     margin-bottom: 1rem;
 
     label {
-      font-size: 0.9rem;
+      font-size: 0.8rem;
     }
   }
 }

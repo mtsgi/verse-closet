@@ -17,6 +17,6 @@ const emit = defineEmits<{
 <style lang="scss">
 .verse-button {
   justify-content: center;
-  font-weight: bold;
+  font-weight: 600;
 }
 </style>
