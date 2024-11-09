@@ -79,7 +79,7 @@ const deleteItem = (key: string) => {
     :open="props.modelValue"
     :title="props.coordinate.name"
     :close="true"
-    class="coordinate-modal"
+    class="modal coordinate-modal"
     @update:open="value => emit('update:modelValue', value)"
   >
     <template #title>
@@ -194,9 +194,6 @@ const deleteItem = (key: string) => {
 
 <style lang="scss">
 .coordinate-modal {
-  overflow: auto;
-  max-height: 100%;
-
   .coordinate-rarity {
     display: inline-flex;
     min-width: 1.25rem;

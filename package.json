@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "@nuxt/eslint": "0.5.7",
-    "@nuxt/ui": "3.0.0-alpha.6",
-    "nuxt": "3.13.2",
+    "@nuxt/ui": "3.0.0-alpha.8",
+    "nuxt": "3.14.159",
     "vue": "latest"
   },
   "volta": {

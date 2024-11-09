@@ -95,6 +95,11 @@ body {
   animation: bgtexture 30s infinite linear;
 }
 
+.modal {
+  overflow: auto;
+  max-height: 100%;
+}
+
 @keyframes bgtexture {
   from { background-position: 0 0; }
   to { background-position: 20rem 8rem; }
