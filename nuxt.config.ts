@@ -40,6 +40,13 @@ export default defineNuxtConfig({
       cardPoolList: String(import.meta.env.NUXT_CARD_POOL_LIST || '').split(','),
     },
   },
+  components: [
+    {
+      // 自動インポートのコンポーネント名にパスを含めない
+      path: '~/components',
+      pathPrefix: false,
+    },
+  ],
   modules: [
     '@nuxt/eslint',
     '@nuxt/ui',

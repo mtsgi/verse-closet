@@ -10,20 +10,20 @@ const runtimeConfig = useRuntimeConfig()
 const formWord = ref<string>('')
 const formBrandName = ref<string>('')
 const formCardPool = ref<string>('')
-const formRarity = ref<number | null>(null)
+const formRarity = ref<number | undefined>()
 
 /** しぼりこみを1つでも使っているか？ */
 const filterUsing = computed<boolean>(() => {
   return formBrandName.value !== ''
     || formCardPool.value !== ''
-    || formRarity.value !== null
+    || formRarity.value !== undefined
 })
 
 /** しぼりこみをすべて解除する */
 const clearFilter = () => {
   formBrandName.value = ''
   formCardPool.value = ''
-  formRarity.value = null
+  formRarity.value = undefined
 }
 
 /** けんさく＆しぼりこみを適用したコーデリスト */
@@ -43,7 +43,7 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
       flag = coordinate.pool.includes(formCardPool.value)
     }
     // レアリティ
-    if (flag && formRarity.value !== null) {
+    if (flag && formRarity.value !== undefined) {
       flag = coordinate.rarity === formRarity.value
     }
 
@@ -90,54 +90,52 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
       />
 
       <template #content>
-        <UCard>
-          <div class="filter-form">
-            <label>ブランド</label>
-            <USelect
-              v-model="formBrandName"
-              :items="runtimeConfig.public.brandNameList"
-            />
-            <UButton
-              icon="solar:close-circle-linear"
-              variant="ghost"
-              color="neutral"
-              :disabled="formBrandName === ''"
-              @click="formBrandName = ''"
-            />
-            <label>バージョン</label>
-            <USelect
-              v-model="formCardPool"
-              :items="runtimeConfig.public.cardPoolList"
-            />
-            <UButton
-              icon="solar:close-circle-linear"
-              variant="ghost"
-              color="neutral"
-              :disabled="formCardPool === ''"
-              @click="formCardPool = ''"
-            />
-            <label>レアリティ</label>
-            <USelect
-              v-model.number="formRarity"
-              :items="[1, 2, 3, 4]"
-            />
-            <UButton
-              icon="solar:close-circle-linear"
-              variant="ghost"
-              color="neutral"
-              :disabled="formRarity === null"
-              @click="formRarity = null"
-            />
-          </div>
+        <div class="filter-form">
+          <label>ブランド</label>
+          <USelect
+            v-model="formBrandName"
+            :items="runtimeConfig.public.brandNameList"
+          />
           <UButton
-            variant="outline"
-            block
-            :disabled="!filterUsing"
-            @click="clearFilter"
-          >
-            しぼりこみを解除する
-          </UButton>
-        </UCard>
+            icon="solar:close-circle-linear"
+            variant="ghost"
+            color="neutral"
+            :disabled="formBrandName === ''"
+            @click="formBrandName = ''"
+          />
+          <label>バージョン</label>
+          <USelect
+            v-model="formCardPool"
+            :items="runtimeConfig.public.cardPoolList"
+          />
+          <UButton
+            icon="solar:close-circle-linear"
+            variant="ghost"
+            color="neutral"
+            :disabled="formCardPool === ''"
+            @click="formCardPool = ''"
+          />
+          <label>レアリティ</label>
+          <USelect
+            v-model.number="formRarity"
+            :items="[1, 2, 3, 4]"
+          />
+          <UButton
+            icon="solar:close-circle-linear"
+            variant="ghost"
+            color="neutral"
+            :disabled="formRarity === undefined"
+            @click="formRarity = undefined"
+          />
+        </div>
+        <UButton
+          variant="outline"
+          block
+          :disabled="!filterUsing"
+          @click="clearFilter"
+        >
+          しぼりこみを解除する
+        </UButton>
       </template>
     </UCollapsible>
   </div>
@@ -171,7 +169,7 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
     align-items: center;
     grid-template-columns: 5rem 1fr 2rem;
     gap: 0.5rem;
-    margin-bottom: 1rem;
+    margin: 1rem 0;
 
     label {
       font-size: 0.8rem;

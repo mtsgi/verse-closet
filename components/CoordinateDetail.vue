@@ -118,7 +118,10 @@ const imageURL = computed(() => {
       > img {
         height: 1.5rem;
         width: 1.5rem;
-        margin-right: -0.5rem;
+
+        &:not(:last-child) {
+          margin-right: -0.5rem;
+        }
       }
     }
   }

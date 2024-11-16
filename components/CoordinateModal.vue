@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { consola } from 'consola'
+
 const props = defineProps<{
   modelValue: boolean
   coordinate: VerseCoordinate
@@ -13,6 +15,18 @@ const emit = defineEmits<{
 
 const database = useDatabase()
 const toast = useToast()
+
+/** 削除確認モーダルの表示状態 */
+const openDeleteModal = ref(false)
+/** 編集フォームの表示状態 */
+const openForm = ref<boolean>(false)
+
+/** 編集が完了したら閉じる処理 */
+const onEdit = () => {
+  emit('update-items')
+  openForm.value = false
+  emit('close-modal')
+}
 
 const imageURL = computed(() => {
   if (props.coordinate.file) {
@@ -47,7 +61,15 @@ const updateItemNumber = (itemType: CoordinateItemType, value: boolean) => {
   item.items[itemType].number = value ? 1 : 0
   const request = objectStore.put(item)
   request.addEventListener('success', () => {
+    consola.success('IDBRequest<IDBValidKey> success')
     emit('update-items')
+  })
+  request.addEventListener('error', () => {
+    consola.error('IDBRequest<IDBValidKey> add error')
+    toast.add({
+      title: 'エラーが発生しました',
+    })
+    emit('close-modal')
   })
 }
 
@@ -63,12 +85,15 @@ const deleteItem = (key: string) => {
     toast.add({
       title: 'コーデを削除しました',
     })
-    console.log('IDBRequest<undefined> success')
+    consola.success('IDBRequest<undefined> success')
     emit('update-items')
     emit('close-modal')
   })
   request.addEventListener('error', () => {
-    console.log('IDBRequest<undefined> error')
+    toast.add({
+      title: 'エラーが発生しました',
+    })
+    consola.error('IDBRequest<undefined> error')
     emit('error')
   })
 }
@@ -148,29 +173,63 @@ const deleteItem = (key: string) => {
       />
 
       <div class="buttons">
-        <UButton
-          icon="solar:pen-linear"
-          size="lg"
-          variant="soft"
-          block
-          disabled
+        <UDrawer
+          v-model:open="openForm"
+          title="コーデへんしゅう"
         >
-          編集する
-        </UButton>
+          <UButton
+            icon="solar:pen-linear"
+            size="lg"
+            variant="soft"
+            block
+          >
+            へんしゅう
+          </UButton>
 
-        <UButton
-          icon="solar:trash-bin-minimalistic-2-linear"
-          size="lg"
-          color="error"
-          variant="soft"
-          block
-          @click="deleteItem(props.coordinate.name)"
+          <template #body>
+            <EditForm
+              :coordinate="coordinate"
+              @edit="onEdit"
+              @close="openForm = false"
+            />
+          </template>
+        </UDrawer>
+
+        <UModal
+          v-model:open="openDeleteModal"
+          :title="`本当に「${props.coordinate.name}」をけしますか？`"
+          description="この操作はとりけすことができません"
+          :ui="{ footer: 'justify-end' }"
         >
-          削除する
-        </UButton>
+          <UButton
+            icon="solar:trash-bin-minimalistic-2-linear"
+            size="lg"
+            color="error"
+            variant="soft"
+            block
+          >
+            けす
+          </UButton>
+
+          <template #footer>
+            <UButton
+              label="やめる"
+              color="neutral"
+              variant="outline"
+              block
+              @click="openDeleteModal = false"
+            />
+            <UButton
+              label="けす"
+              color="error"
+              block
+              @click="deleteItem(props.coordinate.name)"
+            />
+          </template>
+        </UModal>
       </div>
 
-      <UCollapsible>
+      <!-- <UCollapsible>
         <UButton
           label="詳細データを見る"
           color="neutral"
@@ -187,7 +246,7 @@ const deleteItem = (key: string) => {
             <pre>{{ JSON.stringify(props.coordinate, null, 4) }}</pre>
           </UCard>
         </template>
-      </UCollapsible>
+      </UCollapsible> -->
     </template>
   </UModal>
 </template>
@@ -205,7 +264,10 @@ const deleteItem = (key: string) => {
       flex-shrink: 0;
       height: 1.25rem;
       width: 1.25rem;
-      margin-right: -0.5rem;
+
+      &:not(:last-child) {
+        margin-right: -0.5rem;
+      }
     }
   }
 

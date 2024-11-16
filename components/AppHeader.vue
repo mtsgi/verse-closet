@@ -18,10 +18,10 @@ const onRegister = () => {
   <header>
     <UDrawer v-model:open="openSetting">
       <UButton
-        icon="solar:settings-minimalistic-linear"
+        icon="solar:settings-minimalistic-bold"
         size="xl"
-        color="neutral"
-        variant="ghost"
+        color="error"
+        variant="soft"
       />
 
       <template #body>
@@ -44,15 +44,15 @@ const onRegister = () => {
       title="コーデとうろく"
     >
       <UButton
-        icon="solar:add-square-linear"
+        icon="solar:add-square-bold"
         size="xl"
-        color="neutral"
-        variant="ghost"
+        color="info"
+        variant="soft"
       />
 
       <template #body>
         <RegisterForm
-          @register="onRegister"
+          @close="onRegister"
         />
       </template>
     </UDrawer>
