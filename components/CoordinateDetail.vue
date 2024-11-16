@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
   coordinate: VerseCoordinate
+  dispType: 'default' | 'compact' | 'gallery'
 }>()
 
 const emit = defineEmits<{
@@ -21,6 +22,7 @@ const imageURL = computed(() => {
 <template>
   <div
     class="coordinate"
+    :class="`--${props.dispType}`"
     @click="modalOpen = true"
   >
     <!-- 画像 -->
@@ -49,7 +51,9 @@ const imageURL = computed(() => {
           alt="★"
         >
       </div>
-      {{ props.coordinate.brandName }}
+      <div class="brand">
+        {{ props.coordinate.brandName }}
+      </div>
     </div>
 
     <!-- 名前 -->
@@ -67,7 +71,9 @@ const imageURL = computed(() => {
           :number="props.coordinate.items[type].number"
         />
       </div>
-      {{ props.coordinate.pool.join(", ") }}
+      <div class="pool">
+        {{ props.coordinate.pool.join(", ") }}
+      </div>
     </div>
 
     <CoordinateModal
@@ -94,7 +100,7 @@ const imageURL = computed(() => {
     grid-row: 1 / -1;
     width: 6rem;
     height: 6rem;
-    background: #f0f0f0;
+    box-shadow: inset 0 0 0 3px rgba($color: #ffffff, $alpha: 0.5);
     object-fit: cover;
     border-radius: 0.5rem;
 
@@ -103,6 +109,7 @@ const imageURL = computed(() => {
       height: 6rem;
       object-fit: cover;
       border-radius: 0.5rem;
+      box-shadow: 0 1rem 1rem -0.75rem var(--vc-cyan-light);
     }
   }
 
@@ -144,6 +151,51 @@ const imageURL = computed(() => {
       display: flex;
       align-items: center;
       gap: 0.5rem;
+    }
+  }
+
+  &.--compact {
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: 1.5rem;
+
+    .image,
+    .rarity .brand,
+    .items .pool {
+      display: none;
+    }
+  }
+
+  &.--gallery {
+    position: relative;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+
+    .image {
+      justify-self: center;
+      display: grid;
+      place-items: center;
+      max-height: 10rem;
+      max-width: 10rem;
+      box-shadow: none;
+      border: none;
+      width: auto;
+      height: auto;
+
+      img {
+        width: auto;
+        height: auto;
+        max-height: 10rem;
+        max-width: 10rem;
+      }
+    }
+
+    .name {
+      margin-top: 0.5rem;
+    }
+
+    .rarity,
+    .items {
+      display: none;
     }
   }
 }

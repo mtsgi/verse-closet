@@ -10,26 +10,29 @@ const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
 
+/** 編集中のコーデ情報 */
 const form = ref<VerseCoordinate>(props.modelValue)
+// TODO: OTHERを追加する & 初期値をpropsから決定する
 const formSeparate = ref<'true' | 'false'>('true')
 const formFile = ref<File | undefined>(props.modelValue.file)
 
-/** コーデのセパレートタイプによって存在するアイテム種別を返す */
-const coordinateItemTypes = computed<CoordinateItemType[]>(() => {
-  if (formSeparate.value === 'true') {
-    return ['tops', 'bottoms', 'shoes', 'accessory']
-  }
-  else {
-    return ['onepiece', 'shoes', 'accessory']
-  }
-})
+/** 存在するアイテム種別 */
+const coordinateItemTypes = ref<CoordinateItemType[]>(
+  [...props.modelValue.itemType],
+)
 
 /** セパレートタイプ切り替え時に存在しないアイテムの所持数を0にする */
-watch(coordinateItemTypes, (value) => {
-  console.log('新しいitemtypes', value)
+watch(formSeparate, (separateType) => {
+  if (separateType === 'true') {
+    coordinateItemTypes.value = ['tops', 'bottoms', 'shoes', 'accessory']
+  }
+  else {
+    coordinateItemTypes.value = ['onepiece', 'shoes', 'accessory']
+  }
+  console.log('新しいitemTypes', coordinateItemTypes.value)
   const itemTypes = Object.keys(form.value.items) as CoordinateItemType[]
   itemTypes.forEach((itemType) => {
-    if (!value.includes(itemType)) {
+    if (!coordinateItemTypes.value.includes(itemType)) {
       form.value.items[itemType].number = 0
     }
   })

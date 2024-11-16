@@ -79,7 +79,7 @@ const deleteDB = () => {
           </div>
           <USeparator class="my-4" />
         </div>
-        END
+        権利表記ここまで
       </template>
 
       <template #footer>

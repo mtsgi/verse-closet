@@ -67,7 +67,7 @@ const addItem = (item: VerseCoordinate) => {
       @cancel="emit('close')"
     >
       <template #update>
-        追加する
+        とうろく
       </template>
       <template #cancel>
         やめる

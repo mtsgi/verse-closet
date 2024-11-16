@@ -11,6 +11,7 @@ const formWord = ref<string>('')
 const formBrandName = ref<string>('')
 const formCardPool = ref<string>('')
 const formRarity = ref<number | undefined>()
+const dispType = ref<'default' | 'compact' | 'gallery'>('default')
 
 /** しぼりこみを1つでも使っているか？ */
 const filterUsing = computed<boolean>(() => {
@@ -119,7 +120,19 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
           <USelect
             v-model.number="formRarity"
             :items="[1, 2, 3, 4]"
-          />
+          >
+            <template #item-label="{ item }">
+              <div class="form-rarity flex">
+                <img
+                  v-for="i in item"
+                  :key="`list-rarity-${item}-star-${i}`"
+                  src="/star_icon.png"
+                  alt="★"
+                  class="w-5 h-5"
+                >
+              </div>
+            </template>
+          </USelect>
           <UButton
             icon="solar:close-circle-linear"
             variant="ghost"
@@ -138,19 +151,73 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
         </UButton>
       </template>
     </UCollapsible>
+
+    <div class="disp-type">
+      <UButtonGroup>
+        <UButton
+          :variant="dispType === 'default' ? 'solid' : 'outline'"
+          icon="material-symbols:lists"
+          @click="dispType = 'default'"
+        />
+        <UButton
+          :variant="dispType === 'compact' ? 'solid' : 'outline'"
+          icon="material-symbols:menu"
+          @click="dispType = 'compact'"
+        />
+        <UButton
+          :variant="dispType === 'gallery' ? 'solid' : 'outline'"
+          icon="material-symbols:grid-view-outline"
+          @click="dispType = 'gallery'"
+        />
+      </UButtonGroup>
+    </div>
   </div>
 
-  <div class="item-list">
+  <div
+    class="item-list"
+    :class="`--${dispType}`"
+  >
     <CoordinateDetail
       v-for="coordinate in filteredCoordinates"
       :key="coordinate.name"
       :coordinate="coordinate"
+      :disp-type="dispType"
       @update-items="emit('update-items')"
       @error="emit('error')"
     />
+  </div>
+
+  <div class="alerts">
+    <UAlert
+      v-if="database.allCoordinates.length === 0"
+      title="VerseClosetへようこそ！"
+      variant="outline"
+      color="info"
+      icon="solar:lightbulb-outline"
+      :ui="{
+        icon: 'size-8',
+      }"
+    >
+      <template #description>
+        <div class="mt-2">
+          右上の
+          <UButton
+            icon="solar:add-square-bold"
+            size="sm"
+            color="info"
+            variant="soft"
+            class="mx-1"
+          />
+          からコーデをとうろくしてね
+        </div>
+        <div class="mt-2">
+          「ホーム画面に追加」または「インストール」がおすすめです
+        </div>
+      </template>
+    </UAlert>
 
     <UAlert
-      v-if="filteredCoordinates.length === 0"
+      v-else-if="filteredCoordinates.length === 0"
       variant="outline"
       title="ひとつもありません"
     />
@@ -175,6 +242,29 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
       font-size: 0.8rem;
     }
   }
+
+  :deep(.form-rarity) {
+    display: flex;
+
+    img {
+      flex-shrink: 0;
+
+      &:not(:last-child) {
+        margin-right: -0.5rem;
+      }
+    }
+  }
+
+  .disp-type {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+
+    label {
+      font-size: 0.8rem;
+    }
+  }
 }
 
 .item-list {
@@ -182,5 +272,18 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
   flex-direction: column;
   gap: 1rem;
   padding: 1rem;
+
+  &.--gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    grid-auto-flow: row dense;
+  }
+}
+
+.alerts {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0 1rem;
 }
 </style>
