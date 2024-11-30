@@ -48,13 +48,11 @@ const updateItems = () => {
       @update-items="updateItems"
     />
 
-    <div v-if="database.db === null">
-      Loading...
-    </div>
-
     <CoordinateList
       @update-items="updateItems"
     />
+
+    <LoadingSkeleton v-if="database.db === null" />
   </UApp>
 </template>
 

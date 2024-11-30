@@ -11,6 +11,7 @@ const runtimeConfig = useRuntimeConfig()
 const toast = useToast()
 
 const openRightsModal = ref(false)
+const openPrivacyPolicy = ref(false)
 const openDeleteModal = ref(false)
 
 const rights = [
@@ -89,6 +90,31 @@ const deleteDB = () => {
           variant="outline"
           block
           @click="openRightsModal = false"
+        />
+      </template>
+    </UModal>
+
+    <UModal
+      v-model:open="openPrivacyPolicy"
+      title="プライバシーポリシー"
+      class="modal"
+      :ui="{ footer: 'justify-end' }"
+    >
+      <UButton block>
+        プライバシーポリシー
+      </UButton>
+
+      <template #body>
+        このアプリでは、Google Analyticsを使用しています。このツールにより収集されたデータは、Googleのプライバシーポリシーに基づいて管理されます。詳細についてはGoogleのプライバシーポリシー(https://policies.google.com/privacy)をご覧ください。
+      </template>
+
+      <template #footer>
+        <UButton
+          label="とじる"
+          color="neutral"
+          variant="outline"
+          block
+          @click="openPrivacyPolicy = false"
         />
       </template>
     </UModal>

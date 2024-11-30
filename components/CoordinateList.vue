@@ -11,6 +11,7 @@ const formWord = ref<string>('')
 const formBrandName = ref<string>('')
 const formCardPool = ref<string>('')
 const formRarity = ref<number | undefined>()
+const formCompleted = ref<boolean | undefined>()
 const dispType = ref<'default' | 'compact' | 'gallery'>('default')
 
 /** しぼりこみを1つでも使っているか？ */
@@ -46,6 +47,13 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
     // レアリティ
     if (flag && formRarity.value !== undefined) {
       flag = coordinate.rarity === formRarity.value
+    }
+    // フルコーデ
+    if (flag && formCompleted.value !== undefined) {
+      const completed = coordinate.itemType.every((item) => {
+        return coordinate.items[item].number > 0
+      })
+      flag = completed === formCompleted.value
     }
 
     return flag
@@ -104,6 +112,7 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
             :disabled="formBrandName === ''"
             @click="formBrandName = ''"
           />
+
           <label>バージョン</label>
           <USelect
             v-model="formCardPool"
@@ -116,6 +125,7 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
             :disabled="formCardPool === ''"
             @click="formCardPool = ''"
           />
+
           <label>レアリティ</label>
           <USelect
             v-model.number="formRarity"
@@ -139,6 +149,25 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
             color="neutral"
             :disabled="formRarity === undefined"
             @click="formRarity = undefined"
+          />
+
+          <label>フルコーデ</label>
+          <USelect
+            v-model="formCompleted"
+            :items="[{
+              label: 'そろってる',
+              value: true,
+            }, {
+              label: 'そろってない',
+              value: false,
+            }]"
+          />
+          <UButton
+            icon="solar:close-circle-linear"
+            variant="ghost"
+            color="neutral"
+            :disabled="formCompleted === undefined"
+            @click="formCompleted = undefined"
           />
         </div>
         <UButton
@@ -187,7 +216,10 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
     />
   </div>
 
-  <div class="alerts">
+  <div
+    v-if="database.db !== null"
+    class="alerts"
+  >
     <UAlert
       v-if="database.allCoordinates.length === 0"
       title="VerseClosetへようこそ！"
@@ -201,12 +233,10 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
       <template #description>
         <div class="mt-2">
           右上の
-          <UButton
-            icon="solar:add-square-bold"
-            size="sm"
-            color="info"
-            variant="soft"
-            class="mx-1"
+          <UIcon
+            name="solar:add-square-bold"
+            :size="20"
+            style="vertical-align: bottom"
           />
           からコーデをとうろくしてね
         </div>

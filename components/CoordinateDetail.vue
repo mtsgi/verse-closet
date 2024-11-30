@@ -17,6 +17,13 @@ const imageURL = computed(() => {
   }
   return null
 })
+
+/** フルコーデそろってるか？ */
+const completed = computed(() => {
+  return props.coordinate.itemType.every((item) => {
+    return props.coordinate.items[item].number > 0
+  })
+})
 </script>
 
 <template>
@@ -26,20 +33,20 @@ const imageURL = computed(() => {
     @click="modalOpen = true"
   >
     <!-- 画像 -->
-    <div
-      v-if="imageURL"
-      rel="noopener noreferrer"
-      class="image"
-    >
+    <div class="image">
       <img
+        v-if="imageURL"
         :src="imageURL"
         :alt="props.coordinate.name"
       >
+
+      <UIcon
+        v-if="completed"
+        class="completed"
+        name="solar:verified-check-bold-duotone"
+        :size="20"
+      />
     </div>
-    <div
-      v-else
-      class="image"
-    />
 
     <!-- レアリティとブランド名 -->
     <div class="rarity">
@@ -103,6 +110,7 @@ const imageURL = computed(() => {
     box-shadow: inset 0 0 0 3px rgba($color: #ffffff, $alpha: 0.5);
     object-fit: cover;
     border-radius: 0.5rem;
+    position: relative;
 
     img {
       width: 6rem;
@@ -110,6 +118,13 @@ const imageURL = computed(() => {
       object-fit: cover;
       border-radius: 0.5rem;
       box-shadow: 0 1rem 1rem -0.75rem var(--vc-cyan-light);
+    }
+
+    .completed {
+      position: absolute;
+      top: 0.25rem;
+      left: 0.25rem;
+      color: gold;
     }
   }
 

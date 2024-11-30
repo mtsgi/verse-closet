@@ -38,6 +38,12 @@ export default defineNuxtConfig({
       // 以下は環境変数から読み込み
       brandNameList: String(import.meta.env.NUXT_BRAND_NAME_LIST || '').split(','),
       cardPoolList: String(import.meta.env.NUXT_CARD_POOL_LIST || '').split(','),
+      // Nuxt Scripts
+      scripts: {
+        googleAnalytics: {
+          id: String(import.meta.env.NUXT_SCRIPTS_GOOGLE_ANALYTICS_ID || ''),
+        },
+      },
     },
   },
   components: [
@@ -47,14 +53,15 @@ export default defineNuxtConfig({
       pathPrefix: false,
     },
   ],
-  modules: [
-    '@nuxt/eslint',
-    '@nuxt/ui',
-    '@vite-pwa/nuxt',
-  ],
+  modules: ['@nuxt/eslint', '@nuxt/ui', '@vite-pwa/nuxt', '@nuxt/scripts'],
   eslint: {
     config: {
       stylistic: true,
+    },
+  },
+  scripts: {
+    registry: {
+      googleAnalytics: true,
     },
   },
   pwa: {
@@ -64,8 +71,54 @@ export default defineNuxtConfig({
       scope: '/verse-closet/',
       name: 'Verse Closet',
       short_name: 'VerseCloset',
+      lang: 'ja',
+      orientation: 'any',
       description: 'コーデアイテムかんりツール「Verse Closet」',
       theme_color: '#ffcef8',
+      screenshots: [
+        // SP用スクリーンショット
+        {
+          src: 'https://github.com/user-attachments/assets/6633d474-7a04-42da-9429-36d3e20385e6',
+          sizes: '562x1000',
+          form_factor: 'narrow',
+        },
+        {
+          src: 'https://github.com/user-attachments/assets/c84ef825-db94-4725-89f9-155089fc0277',
+          sizes: '562x1000',
+          form_factor: 'narrow',
+        },
+        {
+          src: 'https://github.com/user-attachments/assets/176dc3aa-7e48-4056-adbb-d3f9c814e286',
+          sizes: '562x1000',
+          form_factor: 'narrow',
+        },
+        {
+          src: 'https://github.com/user-attachments/assets/8df3db1f-cb6d-4d4d-bc67-ec4a1d055858',
+          sizes: '562x1000',
+          form_factor: 'narrow',
+        },
+        // PC用スクリーンショット
+        {
+          src: 'https://github.com/user-attachments/assets/632c3054-293a-415b-b260-c4182a956541',
+          sizes: '1620x1215',
+          form_factor: 'wide',
+        },
+        {
+          src: 'https://github.com/user-attachments/assets/edef77be-794e-4d6c-8c4d-114ec2cc6a8e',
+          sizes: '1620x1215',
+          form_factor: 'wide',
+        },
+        {
+          src: 'https://github.com/user-attachments/assets/bff23286-3f7e-4689-a4f2-b3078709166a',
+          sizes: '1620x1215',
+          form_factor: 'wide',
+        },
+        {
+          src: 'https://github.com/user-attachments/assets/5763e16b-9403-4c07-a920-6d2e7f671fbb',
+          sizes: '1620x1215',
+          form_factor: 'wide',
+        },
+      ],
       icons: [
         {
           src: 'android/android-launchericon-512-512.png',

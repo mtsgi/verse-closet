@@ -120,7 +120,10 @@ const deleteItem = (key: string) => {
     </template>
     <template #body>
       <div class="coordinate-badges">
-        <UBadge class="font-bold rounded-full">
+        <UBadge
+          v-if="props.coordinate.brandName"
+          class="font-bold rounded-full"
+        >
           {{ props.coordinate.brandName }}
         </UBadge>
         <UBadge

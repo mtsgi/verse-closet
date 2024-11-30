@@ -17,11 +17,10 @@ const onRegister = () => {
 <template>
   <header>
     <UDrawer v-model:open="openSetting">
-      <UButton
+      <VerseButton
         icon="solar:settings-minimalistic-bold"
-        size="xl"
-        color="error"
-        variant="soft"
+        shape="dia"
+        color="blue"
       />
 
       <template #body>
@@ -43,11 +42,9 @@ const onRegister = () => {
       v-model:open="openForm"
       title="コーデとうろく"
     >
-      <UButton
+      <VerseButton
         icon="solar:add-square-bold"
-        size="xl"
-        color="info"
-        variant="soft"
+        shape="dia"
       />
 
       <template #body>
@@ -66,7 +63,7 @@ header {
   font-size: 1.5rem;
   text-align: center;
   margin-bottom: 2rem;
-  padding: 0.5rem;
+  padding: 0.5rem 1rem;
   background: linear-gradient(90deg, var(--vc-pink-light), var(--vc-cyan-light));
   box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.25);
 

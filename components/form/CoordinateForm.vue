@@ -72,7 +72,7 @@ const update = () => {
         type="text"
         size="xl"
         class="w-full"
-        required
+        :required="true"
       />
     </UFormField>
 
@@ -196,8 +196,6 @@ const update = () => {
 
     <div class="buttons">
       <VerseButton
-        size="xl"
-        class="font-bold rounded-full"
         @click="update"
       >
         <slot name="update">
@@ -205,9 +203,7 @@ const update = () => {
         </slot>
       </VerseButton>
       <VerseButton
-        size="xl"
-        class="font-bold rounded-full"
-        variant="outline"
+        color="blue"
         @click="emit('cancel')"
       >
         <slot name="cancel">
