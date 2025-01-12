@@ -19,6 +19,7 @@ const filterUsing = computed<boolean>(() => {
   return formBrandName.value !== ''
     || formCardPool.value !== ''
     || formRarity.value !== undefined
+    || formCompleted.value !== undefined
 })
 
 /** しぼりこみをすべて解除する */
@@ -26,6 +27,7 @@ const clearFilter = () => {
   formBrandName.value = ''
   formCardPool.value = ''
   formRarity.value = undefined
+  formCompleted.value = undefined
 }
 
 /** けんさく＆しぼりこみを適用したコーデリスト */
@@ -222,7 +224,7 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
   >
     <UAlert
       v-if="database.allCoordinates.length === 0"
-      title="VerseClosetへようこそ！"
+      title="Verse Closetへようこそ！"
       variant="outline"
       color="info"
       icon="solar:lightbulb-outline"

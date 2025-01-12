@@ -12,6 +12,7 @@ const toast = useToast()
 
 const openRightsModal = ref(false)
 const openPrivacyPolicy = ref(false)
+const showDeleteButton = ref(false)
 const openDeleteModal = ref(false)
 
 const rights = [
@@ -119,9 +120,10 @@ const deleteDB = () => {
       </template>
     </UModal>
 
-    <label>さくじょ</label>
+    <!-- <label>さくじょ</label> -->
 
     <UModal
+      v-if="showDeleteButton"
       v-model:open="openDeleteModal"
       title="本当に削除しますか？"
       description="すべてのデータが削除されます"

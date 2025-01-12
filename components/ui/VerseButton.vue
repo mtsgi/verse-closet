@@ -50,6 +50,7 @@ const emit = defineEmits<{
   background-color: var(--verse-button-color);
   background-image: url('/verse-closet/bg_texture.png');
   background-size: 20rem 8rem;
+  animation: bgtexture 60s infinite linear;
   box-shadow:
     inset 0 -1rem 2rem 0 rgba($color: #ffffff, $alpha: 0.75),
     0 0 0 2px #ffffff,

@@ -48,7 +48,7 @@ const addItem = (item: VerseCoordinate) => {
   request.addEventListener('success', () => {
     consola.success('IDBRequest<IDBValidKey> success')
     toast.add({
-      title: 'コーデを追加しました',
+      title: 'コーデをとうろくしました',
     })
     emit('close')
   })

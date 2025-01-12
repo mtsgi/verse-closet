@@ -1,7 +1,7 @@
 {
   "name": "verse-closet",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
@@ -12,9 +12,9 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
-    "@nuxt/eslint": "0.5.7",
+    "@nuxt/eslint": "^0.7.2",
     "@nuxt/scripts": "^0.9.5",
-    "@nuxt/ui": "^3.0.0-alpha.9",
+    "@nuxt/ui": "^3.0.0-alpha.10",
     "nuxt": "3.14.159",
     "vue": "latest"
   },

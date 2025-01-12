@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import { consola } from 'consola'
+
 const runtimeConfig = useRuntimeConfig()
 const database = useDatabase()
 
 // IndexedDB初期化
 const request = window.indexedDB.open(runtimeConfig.public.dbName, runtimeConfig.public.dbVersion)
 request.addEventListener('success', (event) => {
-  console.log('IDBOpenDBRequest success', event.target)
+  consola.success('IDBOpenDBRequest success', event.target)
   const db = request.result
   database.value.db = db
   updateItems()
@@ -13,14 +15,14 @@ request.addEventListener('success', (event) => {
 
 // 新規作成時 objectStoreを作成する
 request.addEventListener('upgradeneeded', (event) => {
-  console.log('IDBOpenDBRequest upgradeneeded', event.target)
+  consola.success('IDBOpenDBRequest upgradeneeded', event.target)
   const db = request.result
   database.value.db = db
   const objectStore = db.createObjectStore('coordinates', { keyPath: 'name' })
   objectStore.createIndex('name', 'name', { unique: true })
   // objectStoreの作成が完了した時
   objectStore.transaction.addEventListener('complete', () => {
-    console.log('IDBTransaction complete')
+    consola.success('IDBTransaction complete')
   })
 })
 

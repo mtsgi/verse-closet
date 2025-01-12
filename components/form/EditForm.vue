@@ -36,7 +36,7 @@ const editItem = (item: VerseCoordinate) => {
       request.addEventListener('success', () => {
         consola.success('IDBRequest<IDBValidKey> delete success')
         toast.add({
-          title: 'コーデを編集しました',
+          title: 'コーデをへんしゅうしました',
         })
         emit('edit')
       })
@@ -62,7 +62,7 @@ const editItem = (item: VerseCoordinate) => {
     request.addEventListener('success', () => {
       consola.success('IDBRequest<IDBValidKey> put success')
       toast.add({
-        title: 'コーデを編集しました',
+        title: 'コーデをへんしゅうしました',
       })
       emit('edit')
     })
