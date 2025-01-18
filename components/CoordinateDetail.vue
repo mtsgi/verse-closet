@@ -40,6 +40,7 @@ const completed = computed(() => {
         :alt="props.coordinate.name"
       >
 
+      <!-- フルコーデ -->
       <UIcon
         v-if="completed"
         class="completed"
@@ -66,6 +67,19 @@ const completed = computed(() => {
     <!-- 名前 -->
     <div class="name">
       {{ props.coordinate.name }}
+    </div>
+
+    <!-- フルコーデ -->
+    <div
+      v-if="props.dispType === 'compact'"
+      class="comp"
+    >
+      <UIcon
+        v-if="completed"
+        class="completed"
+        name="solar:verified-check-bold-duotone"
+        :size="20"
+      />
     </div>
 
     <!-- 各アイテムの所持状況 -->
@@ -124,7 +138,7 @@ const completed = computed(() => {
       position: absolute;
       top: 0.25rem;
       left: 0.25rem;
-      color: gold;
+      color: var(--vc-pink);
     }
   }
 
@@ -157,6 +171,13 @@ const completed = computed(() => {
     text-overflow: ellipsis;
   }
 
+  .comp {
+    .completed {
+      vertical-align: sub;
+      color: var(--vc-pink);
+    }
+  }
+
   .items {
     display: flex;
     align-items: center;
@@ -170,7 +191,7 @@ const completed = computed(() => {
   }
 
   &.--compact {
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto 1fr auto auto;
     grid-template-rows: 1.5rem;
 
     .image,
@@ -191,6 +212,8 @@ const completed = computed(() => {
       place-items: center;
       max-height: 10rem;
       max-width: 10rem;
+      min-height: 10rem;
+      min-width: 10rem;
       box-shadow: none;
       border: none;
       width: auto;
@@ -201,6 +224,8 @@ const completed = computed(() => {
         height: auto;
         max-height: 10rem;
         max-width: 10rem;
+        min-height: 10rem;
+        min-width: 10rem;
       }
     }
 

@@ -98,6 +98,7 @@ const update = () => {
         class="w-full"
         :items="runtimeConfig.public.cardPoolList"
         multiple
+        :search-input="false"
       >
         <template #default>
           <UBadge
@@ -105,6 +106,7 @@ const update = () => {
             :key="`register-pool-${pool}`"
             :label="pool"
             variant="outline"
+            class="rounded-full"
           />
         </template>
       </USelectMenu>
