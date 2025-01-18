@@ -2,10 +2,16 @@ import packageJson from './package.json'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2024-04-03',
+  modules: ['@nuxt/eslint', '@nuxt/ui', '@vite-pwa/nuxt', '@nuxt/scripts'],
   ssr: false,
+  components: [
+    {
+      // 自動インポートのコンポーネント名にパスを含めない
+      path: '~/components',
+      pathPrefix: false,
+    },
+  ],
   devtools: { enabled: false },
-  colorMode: { preference: 'light' },
   app: {
     baseURL: '/verse-closet/',
     head: {
@@ -26,10 +32,7 @@ export default defineNuxtConfig({
       ],
     },
   },
-  vite: {
-    // `NUXT_` から始まる環境変数を読み込む
-    envPrefix: 'NUXT',
-  },
+  colorMode: { preference: 'light' },
   runtimeConfig: {
     public: {
       dbName: 'VerseCloset',
@@ -46,22 +49,14 @@ export default defineNuxtConfig({
       },
     },
   },
-  components: [
-    {
-      // 自動インポートのコンポーネント名にパスを含めない
-      path: '~/components',
-      pathPrefix: false,
-    },
-  ],
-  modules: ['@nuxt/eslint', '@nuxt/ui', '@vite-pwa/nuxt', '@nuxt/scripts'],
+  compatibilityDate: '2024-04-03',
+  vite: {
+    // `NUXT_` から始まる環境変数を読み込む
+    envPrefix: 'NUXT',
+  },
   eslint: {
     config: {
       stylistic: true,
-    },
-  },
-  scripts: {
-    registry: {
-      googleAnalytics: true,
     },
   },
   pwa: {
@@ -260,5 +255,10 @@ export default defineNuxtConfig({
       globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
     },
     devOptions: { enabled: true },
+  },
+  scripts: {
+    registry: {
+      googleAnalytics: true,
+    },
   },
 })
