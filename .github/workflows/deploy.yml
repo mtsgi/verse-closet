@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - develop
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,7 +15,7 @@ jobs:
       - run: corepack enable
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
       - run: npm install
       - run: NUXT_APP_BASE_URL=/verse-closet/ NUXT_BRAND_NAME_LIST="${{ vars.NUXT_BRAND_NAME_LIST }}" NUXT_CARD_POOL_LIST="${{ vars.NUXT_CARD_POOL_LIST }}" NUXT_SCRIPTS_GOOGLE_ANALYTICS_ID="${{ vars.NUXT_SCRIPTS_GOOGLE_ANALYTICS_ID }}" npx nuxt build --preset github_pages
       - name: Upload artifact
@@ -23,6 +24,7 @@ jobs:
           path: ./.output/public
   deploy:
     needs: build
+    if: github.ref == 'refs/heads/main'
     permissions:
       pages: write      # to deploy to Pages
       id-token: write   # to verify the deployment originates from an appropriate source
