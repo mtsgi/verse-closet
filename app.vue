@@ -59,7 +59,7 @@ const updateItems = () => {
 </template>
 
 <style>
-@import "tailwindcss";
+@import "tailwindcss" theme(static);
 @import "@nuxt/ui";
 
 :root {

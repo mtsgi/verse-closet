@@ -41,12 +41,15 @@ const completed = computed(() => {
       >
 
       <!-- フルコーデ -->
-      <UIcon
+      <div
         v-if="completed"
         class="completed"
-        name="solar:verified-check-bold-duotone"
-        :size="20"
-      />
+      >
+        <UIcon
+          name="solar:verified-check-bold-duotone"
+          :size="20"
+        />
+      </div>
     </div>
 
     <!-- レアリティとブランド名 -->
@@ -138,7 +141,18 @@ const completed = computed(() => {
       position: absolute;
       top: 0.25rem;
       left: 0.25rem;
-      color: var(--vc-pink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      border: 2px solid var(--vc-pink-light);
+      border-radius: 0.25rem;
+      background: var(--color-white);
+
+      > span {
+        color: var(--vc-pink);
+      }
     }
   }
 
