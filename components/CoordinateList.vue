@@ -229,6 +229,7 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
       color="info"
       icon="solar:lightbulb-outline"
       :ui="{
+        root: 'bg-white shadow-md',
         icon: 'size-8',
       }"
     >

@@ -4,26 +4,41 @@ import { consola } from 'consola'
 const runtimeConfig = useRuntimeConfig()
 const database = useDatabase()
 
+const tab = ref<'coordinates' | 'mylists'>('coordinates')
+
 // IndexedDB初期化
 const request = window.indexedDB.open(runtimeConfig.public.dbName, runtimeConfig.public.dbVersion)
 request.addEventListener('success', (event) => {
-  consola.success('IDBOpenDBRequest success', event.target)
   const db = request.result
   database.value.db = db
+  consola.success(`IDBOpenDBRequest success (version: ${db.version})`, event.target)
   updateItems()
 })
 
 // 新規作成時 objectStoreを作成する
 request.addEventListener('upgradeneeded', (event) => {
-  consola.success('IDBOpenDBRequest upgradeneeded', event.target)
+  consola.success(`IDBOpenDBRequest upgradeneeded (version: ${event.oldVersion} -> ${event.newVersion})`, event.target)
   const db = request.result
   database.value.db = db
-  const objectStore = db.createObjectStore('coordinates', { keyPath: 'name' })
-  objectStore.createIndex('name', 'name', { unique: true })
-  // objectStoreの作成が完了した時
-  objectStore.transaction.addEventListener('complete', () => {
-    consola.success('IDBTransaction complete')
-  })
+
+  // バージョンごとに差分を適用
+  if (event.oldVersion < 1) {
+    // バージョン1: 'coordinates' オブジェクトストアを作成
+    if (!db.objectStoreNames.contains('coordinates')) {
+      const coordinatesStore = db.createObjectStore('coordinates', { keyPath: 'name' })
+      coordinatesStore.createIndex('name', 'name', { unique: true })
+      consola.success('Coordinates store created', coordinatesStore)
+    }
+  }
+
+  // if (event.oldVersion < 2) {
+  //   // バージョン2: 'mylists' オブジェクトストアを作成
+  //   if (!db.objectStoreNames.contains('mylists')) {
+  //     const mylistsStore = db.createObjectStore('mylists', { keyPath: 'name' })
+  //     mylistsStore.createIndex('name', 'name', { unique: true })
+  //     consola.success('Mylists store created', mylistsStore)
+  //   }
+  // }
 })
 
 /** allItemsを更新する */
@@ -50,7 +65,15 @@ const updateItems = () => {
       @update-items="updateItems"
     />
 
+    <AppTabs v-model="tab" />
+
     <CoordinateList
+      v-if="tab === 'coordinates'"
+      @update-items="updateItems"
+    />
+
+    <MylistList
+      v-if="tab === 'mylists'"
       @update-items="updateItems"
     />
 
@@ -59,7 +82,7 @@ const updateItems = () => {
 </template>
 
 <style>
-@import "tailwindcss" theme(static);
+@import "tailwindcss";
 @import "@nuxt/ui";
 
 :root {
