@@ -1,8 +1,8 @@
 /** `useDatabse` の中身 */
 interface DatabaseState {
   db: null | IDBDatabase
-  allCoordinates: VerseCoordinate[]
-  mylists: VerseMylist[]
+  coordinates: VerseCoordinate[]
+  collections: VerseCollection[]
 }
 
 /** コーデを表すインターフェース */
@@ -47,9 +47,9 @@ export interface CoordinateItemState<T extends CoordinateItemType> {
   name: string
 }
 
-/** マイリストのインターフェース */
-export interface VerseMylist {
-  /** マイリストの名前(例: 「お気に入り」) */
+/** コレクションのインターフェース */
+export interface VerseCollection {
+  /** コレクションの名前(例: 「お気に入り」) */
   name: string
   /** コーデ */
   coordinates: string[]
@@ -65,8 +65,8 @@ export const useDatabase = () => {
   return useState<DatabaseState>('database', () => {
     return {
       db: null,
-      allCoordinates: [],
-      mylists: [],
+      coordinates: [],
+      collections: [],
     }
   })
 }

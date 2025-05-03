@@ -30,7 +30,8 @@ const deleteDB = () => {
   request.addEventListener('success', () => {
     toast.add({ title: 'データベースを削除しました' })
     database.value.db = null
-    database.value.allCoordinates = []
+    database.value.coordinates = []
+    database.value.collections = []
   })
 }
 </script>

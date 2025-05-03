@@ -32,7 +32,7 @@ const clearFilter = () => {
 
 /** けんさく＆しぼりこみを適用したコーデリスト */
 const filteredCoordinates = computed<VerseCoordinate[]>(() => {
-  return database.value.allCoordinates.filter((coordinate) => {
+  return database.value.coordinates.filter((coordinate) => {
     let flag = true
     // けんさくワード
     if (flag && formWord.value !== '') {
@@ -223,7 +223,7 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
     class="alerts"
   >
     <UAlert
-      v-if="database.allCoordinates.length === 0"
+      v-if="database.coordinates.length === 0"
       title="Verse Closetへようこそ！"
       variant="outline"
       color="info"

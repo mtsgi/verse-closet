@@ -8,7 +8,7 @@ const openSetting = ref<boolean>(false)
 /** 追加フォームの表示状態 */
 const openForm = ref<boolean>(false)
 
-const onRegister = () => {
+const onClose = () => {
   emit('update-items')
   openForm.value = false
 }
@@ -48,8 +48,8 @@ const onRegister = () => {
       />
 
       <template #body>
-        <RegisterForm
-          @close="onRegister"
+        <CoordinateRegisterForm
+          @close="onClose"
         />
       </template>
     </UDrawer>

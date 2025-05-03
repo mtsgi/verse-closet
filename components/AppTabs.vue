@@ -1,5 +1,5 @@
 <script setup lang="ts">
-type AppTabType = 'coordinates' | 'mylists'
+type AppTabType = 'coordinates' | 'collections'
 
 // タブの種類を定義
 defineModel<AppTabType>()
@@ -19,7 +19,7 @@ const updateValue = (value: string | number) => {
       :model-value="modelValue"
       :items="[
         { value: 'coordinates', label: 'コーデ', icon: 'icon-park-solid:full-dress-longuette' },
-        { value: 'mylists', label: 'マイリスト', icon: 'icon-park-solid:healthy-recognition' },
+        { value: 'collections', label: 'コレクション', icon: 'icon-park-solid:healthy-recognition' },
       ]"
       :ui="{
         list: 'shadow-md bg-white',

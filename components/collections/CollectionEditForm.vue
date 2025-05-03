@@ -4,7 +4,7 @@ import { consola } from 'consola'
 const database = useDatabase()
 
 const props = defineProps<{
-  coordinate: VerseCoordinate
+  collection: VerseCollection
 }>()
 
 const emit = defineEmits<{
@@ -14,21 +14,21 @@ const emit = defineEmits<{
 
 const toast = useToast()
 
-const form = ref<VerseCoordinate>({ ...props.coordinate })
+const form = ref<VerseCollection>({ ...props.collection })
 
-const editItem = (item: VerseCoordinate) => {
+const editItem = (item: VerseCollection) => {
   if (!database.value.db) {
     return
   }
-  // コーデ名の変更をチェック
-  const nameChanged = props.coordinate.name !== item.name
-  console.log('nameChanged', nameChanged)
-  const transaction = database.value.db.transaction(['coordinates'], 'readwrite')
-  const objectStore = transaction.objectStore('coordinates')
+  // コレクション名の変更をチェック
+  const nameChanged = props.collection.name !== item.name
+  // console.log('nameChanged', nameChanged)
+  const transaction = database.value.db.transaction(['collections'], 'readwrite')
+  const objectStore = transaction.objectStore('collections')
 
   if (nameChanged) {
-    // コーデのなまえが変更されている場合はaddしてremove
-    const originalName = props.coordinate.name
+    // コレクションのなまえが変更されている場合はaddしてremove
+    const originalName = props.collection.name
     const request = objectStore.add(item)
     request.addEventListener('success', () => {
       consola.success('IDBRequest<IDBValidKey> add success')
@@ -36,14 +36,14 @@ const editItem = (item: VerseCoordinate) => {
       request.addEventListener('success', () => {
         consola.success('IDBRequest<IDBValidKey> delete success')
         toast.add({
-          title: 'コーデをへんしゅうしました',
+          title: 'コレクションをへんしゅうしました',
         })
         emit('edit')
       })
       request.addEventListener('error', () => {
         consola.error('IDBRequest<IDBValidKey> add error')
         toast.add({
-          title: 'エラーが発生しました',
+          title: 'エラーがはっせいしました',
         })
         emit('close')
       })
@@ -51,25 +51,25 @@ const editItem = (item: VerseCoordinate) => {
     request.addEventListener('error', () => {
       consola.error('IDBRequest<IDBValidKey> add error')
       toast.add({
-        title: 'エラーが発生しました',
+        title: 'エラーがはっせいしました',
       })
       emit('close')
     })
   }
   else {
-    // コーデのなまえが変更されていない場合はputする
+    // コレクションのなまえが変更されていない場合はputする
     const request = objectStore.put(item)
     request.addEventListener('success', () => {
       consola.success('IDBRequest<IDBValidKey> put success')
       toast.add({
-        title: 'コーデをへんしゅうしました',
+        title: 'コレクションをへんしゅうしました',
       })
       emit('edit')
     })
     request.addEventListener('error', () => {
-      consola.error('IDBRequest<IDBValidKey> add error')
+      consola.error('IDBRequest<IDBValidKey> put error')
       toast.add({
-        title: 'エラーが発生しました',
+        title: 'エラーがはっせいしました',
       })
       emit('close')
     })
@@ -79,7 +79,7 @@ const editItem = (item: VerseCoordinate) => {
 
 <template>
   <div class="register">
-    <CoordinateForm
+    <CollectionForm
       v-model="form"
       @update:model-value="editItem"
       @cancel="emit('close')"
@@ -90,6 +90,6 @@ const editItem = (item: VerseCoordinate) => {
       <template #cancel>
         やめる
       </template>
-    </CoordinateForm>
+    </CollectionForm>
   </div>
 </template>

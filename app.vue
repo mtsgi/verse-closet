@@ -4,7 +4,7 @@ import { consola } from 'consola'
 const runtimeConfig = useRuntimeConfig()
 const database = useDatabase()
 
-const tab = ref<'coordinates' | 'mylists'>('coordinates')
+const tab = ref<'coordinates' | 'collections'>('coordinates')
 
 // IndexedDB初期化
 const request = window.indexedDB.open(runtimeConfig.public.dbName, runtimeConfig.public.dbVersion)
@@ -21,7 +21,7 @@ request.addEventListener('upgradeneeded', (event) => {
   const db = request.result
   database.value.db = db
 
-  // バージョンごとに差分を適用
+  // Indexed DBバージョンごとに差分を適用
   if (event.oldVersion < 1) {
     // バージョン1: 'coordinates' オブジェクトストアを作成
     if (!db.objectStoreNames.contains('coordinates')) {
@@ -31,28 +31,37 @@ request.addEventListener('upgradeneeded', (event) => {
     }
   }
 
-  // if (event.oldVersion < 2) {
-  //   // バージョン2: 'mylists' オブジェクトストアを作成
-  //   if (!db.objectStoreNames.contains('mylists')) {
-  //     const mylistsStore = db.createObjectStore('mylists', { keyPath: 'name' })
-  //     mylistsStore.createIndex('name', 'name', { unique: true })
-  //     consola.success('Mylists store created', mylistsStore)
-  //   }
-  // }
+  if (event.oldVersion < 2) {
+    // バージョン2: 'collections' オブジェクトストアを作成
+    if (!db.objectStoreNames.contains('collections')) {
+      const collectionsStore = db.createObjectStore('collections', { keyPath: 'name' })
+      collectionsStore.createIndex('name', 'name', { unique: true })
+      consola.success('Collections store created', collectionsStore)
+    }
+  }
 })
 
-/** allItemsを更新する */
+/** databaseのストアを更新する */
 const updateItems = () => {
   const db = database.value.db
   if (!db) {
     return
   }
-  const transaction = db.transaction(['coordinates'], 'readonly')
-  const objectStore = transaction.objectStore('coordinates')
-  const request = objectStore.getAll()
+  // コーデの情報を更新
+  const coordinateTransaction = db.transaction(['coordinates'], 'readonly')
+  const coordinateObjectStore = coordinateTransaction.objectStore('coordinates')
+  const request = coordinateObjectStore.getAll()
   request.addEventListener('success', (event) => {
     // @ts-expect-error event.target.result => IDBRequest.result
-    database.value.allCoordinates = event.target?.result || []
+    database.value.coordinates = event.target?.result || []
+  })
+
+  const collectionTransaction = db.transaction(['collections'], 'readonly')
+  const collectionObjectStore = collectionTransaction.objectStore('collections')
+  const collectionRequest = collectionObjectStore.getAll()
+  collectionRequest.addEventListener('success', (event) => {
+    // @ts-expect-error event.target.result => IDBRequest.result
+    database.value.collections = event.target?.result || []
   })
 }
 </script>
@@ -72,8 +81,8 @@ const updateItems = () => {
       @update-items="updateItems"
     />
 
-    <MylistList
-      v-if="tab === 'mylists'"
+    <CollectionList
+      v-if="tab === 'collections'"
       @update-items="updateItems"
     />
 
