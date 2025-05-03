@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: "22"
       - run: npm install
-      - run: NUXT_APP_BASE_URL=/verse-closet/ NUXT_BRAND_NAME_LIST="${{ vars.NUXT_BRAND_NAME_LIST }}" NUXT_CARD_POOL_LIST="${{ vars.NUXT_CARD_POOL_LIST }}" NUXT_SCRIPTS_GOOGLE_ANALYTICS_ID="${{ vars.NUXT_SCRIPTS_GOOGLE_ANALYTICS_ID }}" npx nuxt build --preset github_pages
+      - run: NUXT_BASE_URL=/verse-closet/ NUXT_BRAND_NAME_LIST="${{ vars.NUXT_BRAND_NAME_LIST }}" NUXT_CARD_POOL_LIST="${{ vars.NUXT_CARD_POOL_LIST }}" NUXT_SCRIPTS_GOOGLE_ANALYTICS_ID="${{ vars.NUXT_SCRIPTS_GOOGLE_ANALYTICS_ID }}" npx nuxt build --preset github_pages
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

@@ -239,12 +239,6 @@ const update = () => {
     }
   }
 
-  .form-file {
-    border-color: var(--color-gray-300);
-    padding: 0.25rem;
-    border-radius: 0.5rem;
-  }
-
   .buttons {
     display: grid;
     grid-template-columns: 1fr 1fr;

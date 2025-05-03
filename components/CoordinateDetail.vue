@@ -39,6 +39,15 @@ const completed = computed(() => {
         :src="imageURL"
         :alt="props.coordinate.name"
       >
+      <div
+        v-else
+        class="no-image"
+      >
+        <UIcon
+          name="icon-park-solid:full-dress-longuette"
+          size="50"
+        />
+      </div>
 
       <!-- フルコーデ -->
       <div
@@ -102,7 +111,7 @@ const completed = computed(() => {
 
     <CoordinateModal
       v-model="modalOpen"
-      :coordinate="coordinate"
+      :coordinate="props.coordinate"
       @close-modal="modalOpen = false"
       @update-items="emit('update-items')"
       @error="emit('error')"
@@ -120,10 +129,13 @@ const completed = computed(() => {
   font-size: 0.8rem;
 
   .image {
+    display: grid;
+    place-items: center;
     grid-column: 1 / 2;
     grid-row: 1 / -1;
     width: 6rem;
     height: 6rem;
+    background: rgba($color: #ffffff, $alpha: 0.5);
     box-shadow: inset 0 0 0 3px rgba($color: #ffffff, $alpha: 0.5);
     object-fit: cover;
     border-radius: 0.5rem;
@@ -135,6 +147,10 @@ const completed = computed(() => {
       object-fit: cover;
       border-radius: 0.5rem;
       box-shadow: 0 1rem 1rem -0.75rem var(--vc-cyan-light);
+    }
+
+    .no-image {
+      color: var(--vc-cyan-light);
     }
 
     .completed {
