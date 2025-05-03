@@ -48,7 +48,7 @@ const emit = defineEmits<{
   border-radius: calc(infinity * 1px);
   justify-content: center;
   background-color: var(--verse-button-color);
-  background-image: url('/verse-closet/bg_texture.png');
+  background-image: url('./bg_texture.png');
   background-size: 20rem 8rem;
   animation: bgtexture 60s infinite linear;
   box-shadow:
