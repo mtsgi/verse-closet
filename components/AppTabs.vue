@@ -18,7 +18,7 @@ const updateValue = (value: string | number) => {
     <UTabs
       :model-value="modelValue"
       :items="[
-        { value: 'coordinates', label: 'コーデ', icon: 'icon-park-solid:full-dress-longuette' },
+        { value: 'coordinates', label: 'コーデいちらん', icon: 'icon-park-solid:full-dress-longuette' },
         { value: 'collections', label: 'コレクション', icon: 'icon-park-solid:healthy-recognition' },
       ]"
       :ui="{

@@ -13,6 +13,8 @@ const formCardPool = ref<string>('')
 const formRarity = ref<number | undefined>()
 const formCompleted = ref<boolean | undefined>()
 const dispType = ref<'default' | 'compact' | 'gallery'>('default')
+const sortType = ref<'name' | 'brand' | 'rarity'>('name')
+const sortOrder = ref<'asc' | 'desc'>('desc')
 
 /** しぼりこみを1つでも使っているか？ */
 const filterUsing = computed<boolean>(() => {
@@ -30,9 +32,9 @@ const clearFilter = () => {
   formCompleted.value = undefined
 }
 
-/** けんさく＆しぼりこみを適用したコーデリスト */
+/** けんさく＆しぼりこみ＆ならびかえを適用したコーデリスト */
 const filteredCoordinates = computed<VerseCoordinate[]>(() => {
-  return database.value.coordinates.filter((coordinate) => {
+  const result = database.value.coordinates.filter((coordinate) => {
     let flag = true
     // けんさくワード
     if (flag && formWord.value !== '') {
@@ -60,6 +62,27 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
 
     return flag
   })
+
+  // ならびかえ
+  result.sort((a, b) => {
+    if (sortType.value === 'name') {
+      // NOTE: ひらがな・カタカナは同列になる
+      return a.name.localeCompare(b.name)
+    } else if (sortType.value === 'brand') {
+      // brandNameListに入っている順
+      return runtimeConfig.public.brandNameList.indexOf(a.brandName) -
+        runtimeConfig.public.brandNameList.indexOf(b.brandName)
+    } else if (sortType.value === 'rarity') {
+      return a.rarity - b.rarity
+    }
+    return 0
+  })
+
+  if (sortOrder.value === 'asc') {
+    result.reverse()
+  }
+
+  return result
 })
 </script>
 
@@ -178,12 +201,32 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
           :disabled="!filterUsing"
           @click="clearFilter"
         >
-          しぼりこみを解除する
+          しぼりこみをかいじょする
         </UButton>
       </template>
     </UCollapsible>
 
-    <div class="disp-type">
+    <!-- ならびかえと表示タイプ -->
+    <div class="disp-menu">
+      <UButtonGroup>
+        <UButton
+          color="neutral"
+          variant="outline"
+          :icon="sortOrder === 'asc' ? 'icon-park-solid:up-two' : 'icon-park-solid:down-two'"
+          @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
+        />
+        <USelect
+          v-model="sortType"
+          :items="[
+            { label: 'コーデのなまえ', value: 'name' },
+            { label: 'ブランド', value: 'brand' },
+            { label: 'レアリティ', value: 'rarity' },
+          ]"
+        />
+      </UButtonGroup>
+
+      <div class="separator" />
+
       <UButtonGroup>
         <UButton
           :variant="dispType === 'default' ? 'solid' : 'outline'"
@@ -261,7 +304,7 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
 .form {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
   padding: 0 1rem;
 
   .filter-form {
@@ -288,11 +331,14 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
     }
   }
 
-  .disp-type {
+  .disp-menu {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
     gap: 0.5rem;
+
+    .separator {
+      flex-grow: 1;
+    }
 
     label {
       font-size: 0.8rem;
