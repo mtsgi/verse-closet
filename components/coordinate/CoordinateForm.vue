@@ -2,7 +2,10 @@
 const runtimeConfig = useRuntimeConfig()
 
 const props = defineProps<{
+  /** 編集対象のコーデ */
   modelValue: VerseCoordinate
+  /** なまえのフォームを無効にするか */
+  disableName?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -73,6 +76,7 @@ const update = () => {
         size="xl"
         class="w-full"
         :required="true"
+        :disabled="props.disableName"
       />
     </UFormField>
 

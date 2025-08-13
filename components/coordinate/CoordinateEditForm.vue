@@ -81,6 +81,7 @@ const editItem = (item: VerseCoordinate) => {
   <div class="register">
     <CoordinateForm
       v-model="form"
+      :disable-name="true"
       @update:model-value="editItem"
       @cancel="emit('close')"
     >

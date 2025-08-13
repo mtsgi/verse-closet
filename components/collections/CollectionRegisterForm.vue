@@ -24,7 +24,7 @@ const addCollection = (item: VerseCollection) => {
   }
   // 登録日時を現在日時にする
   item.createdAt = new Date()
-  console.log('item', item)
+  consola.log('item', item)
 
   const transaction = database.value.db.transaction(['collections'], 'readwrite')
   const objectStore = transaction.objectStore('collections')

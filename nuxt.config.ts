@@ -41,7 +41,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       dbName: 'VerseCloset',
-      dbVersion: 1,
+      dbVersion: 2,
       appVersion: packageJson.version,
       // 以下は環境変数から読み込み
       brandNameList: String(import.meta.env.NUXT_BRAND_NAME_LIST || '').split(','),
