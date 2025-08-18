@@ -29,7 +29,7 @@ const deleteDB = () => {
       v-model="openDataTransferModal"
     />
 
-    <label>バージョン情報</label>
+    <label>バージョンじょうほう</label>
 
     <div>
       Verse Closet バージョン {{ runtimeConfig.public.appVersion }}

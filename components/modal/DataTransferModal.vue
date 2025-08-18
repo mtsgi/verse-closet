@@ -120,8 +120,8 @@ const importData = () => {
       return
     }
     // コーデをIndexedDBに書き込み
-    const transaction = database.value.db.transaction(['coordinates'], 'readwrite')
-    const objectStore = transaction.objectStore('coordinates')
+    const transaction = database.value.db.transaction(['coordinates', 'collections'], 'readwrite')
+    const coordinateStore = transaction.objectStore('coordinates')
     for (const coordinate of coordinates) {
       // すでに存在しないか確認
       const alreadyExists = database.value.coordinates.some(c => c.name === coordinate.name)
@@ -130,7 +130,7 @@ const importData = () => {
         continue
       }
       // ObjectStoreとComposableに書き込み
-      const request = objectStore.put(coordinate)
+      const request = coordinateStore.put(coordinate)
       request.addEventListener('success', () => {
         database.value.coordinates.push(coordinate) // Composableに追加
         toast.add({ title: `コーデ「${coordinate.name}」をよみこみました`, color: 'success', icon: 'icon-park-solid:check-one' })
@@ -142,8 +142,7 @@ const importData = () => {
       })
     }
     // コレクションをIndexedDBに書き込み
-    const transaction2 = database.value.db.transaction(['collections'], 'readwrite')
-    const objectStore2 = transaction2.objectStore('collections')
+    const collectionStore = transaction.objectStore('collections')
     // コレクションをIndexedDBに書き込み
     for (const collection of collections) {
       // すでに存在しないか確認
@@ -153,7 +152,7 @@ const importData = () => {
         continue
       }
       // ObjectStoreとComposableに書き込み
-      const request = objectStore2.put(collection)
+      const request = collectionStore.put(collection)
       request.addEventListener('success', () => {
         database.value.collections.push(collection) // Composableに追加
         toast.add({ title: `コレクション「${collection.name}」をよみこみました`, color: 'success', icon: 'icon-park-solid:check-one' })
