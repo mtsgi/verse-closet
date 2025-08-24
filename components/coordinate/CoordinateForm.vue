@@ -2,7 +2,10 @@
 const runtimeConfig = useRuntimeConfig()
 
 const props = defineProps<{
+  /** 編集対象のコーデ */
   modelValue: VerseCoordinate
+  /** なまえのフォームを無効にするか */
+  disableName?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -73,6 +76,7 @@ const update = () => {
         size="xl"
         class="w-full"
         :required="true"
+        :disabled="props.disableName"
       />
     </UFormField>
 
@@ -237,12 +241,6 @@ const update = () => {
         margin-right: -0.75rem;
       }
     }
-  }
-
-  .form-file {
-    border-color: var(--color-gray-300);
-    padding: 0.25rem;
-    border-radius: 0.5rem;
   }
 
   .buttons {

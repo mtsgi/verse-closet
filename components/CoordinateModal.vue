@@ -19,12 +19,14 @@ const toast = useToast()
 /** 削除確認モーダルの表示状態 */
 const openDeleteModal = ref(false)
 /** 編集フォームの表示状態 */
-const openForm = ref<boolean>(false)
+const openEditForm = ref<boolean>(false)
+/** コレクション登録フォームの表示状態 */
+const openCollectionForm = ref<boolean>(false)
 
 /** 編集が完了したら閉じる処理 */
 const onEdit = () => {
   emit('update-items')
-  openForm.value = false
+  openEditForm.value = false
   emit('close-modal')
 }
 
@@ -83,7 +85,7 @@ const deleteItem = (key: string) => {
   const request = objectStore.delete(key)
   request.addEventListener('success', () => {
     toast.add({
-      title: 'コーデを削除しました',
+      title: 'コーデをさくじょしました',
     })
     consola.success('IDBRequest<undefined> success')
     emit('update-items')
@@ -91,7 +93,7 @@ const deleteItem = (key: string) => {
   })
   request.addEventListener('error', () => {
     toast.add({
-      title: 'エラーが発生しました',
+      title: 'エラーがはっせいしました',
     })
     consola.error('IDBRequest<undefined> error')
     emit('error')
@@ -105,7 +107,7 @@ const deleteItem = (key: string) => {
     :title="props.coordinate.name"
     :close="true"
     class="modal coordinate-modal"
-    @update:open="value => emit('update:modelValue', value)"
+    @update:open="(value: boolean) => emit('update:modelValue', value)"
   >
     <template #title>
       <div class="coordinate-rarity">
@@ -177,7 +179,32 @@ const deleteItem = (key: string) => {
 
       <div class="buttons">
         <UDrawer
-          v-model:open="openForm"
+          v-model:open="openCollectionForm"
+          title="コレクションについか"
+        >
+          <UButton
+            icon="icon-park-solid:healthy-recognition"
+            size="lg"
+            color="primary"
+            variant="outline"
+            block
+          >
+            コレクションについか
+          </UButton>
+
+          <template #body>
+            <AddToCollectionForm
+              :coordinate="props.coordinate"
+              @update-items="emit('update-items')"
+              @close="openCollectionForm = false"
+            />
+          </template>
+        </UDrawer>
+      </div>
+
+      <div class="buttons">
+        <UDrawer
+          v-model:open="openEditForm"
           title="コーデへんしゅう"
         >
           <UButton
@@ -190,10 +217,10 @@ const deleteItem = (key: string) => {
           </UButton>
 
           <template #body>
-            <EditForm
-              :coordinate="coordinate"
+            <CoordinateEditForm
+              :coordinate="props.coordinate"
               @edit="onEdit"
-              @close="openForm = false"
+              @close="openEditForm = false"
             />
           </template>
         </UDrawer>

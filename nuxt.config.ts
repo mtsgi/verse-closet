@@ -13,7 +13,7 @@ export default defineNuxtConfig({
   ],
   devtools: { enabled: false },
   app: {
-    baseURL: '/verse-closet/',
+    baseURL: String(import.meta.env.NUXT_BASE_URL || '/verse-closet/'),
     head: {
       title: 'Verse Closet',
       meta: [
@@ -41,7 +41,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       dbName: 'VerseCloset',
-      dbVersion: 1,
+      dbVersion: 2,
       appVersion: packageJson.version,
       // 以下は環境変数から読み込み
       brandNameList: String(import.meta.env.NUXT_BRAND_NAME_LIST || '').split(','),
@@ -68,7 +68,7 @@ export default defineNuxtConfig({
     strategies: 'generateSW',
     manifest: {
       id: 'verse-closet',
-      scope: '/verse-closet/',
+      scope: String(import.meta.env.NUXT_BASE_URL || '/verse-closet/'),
       name: 'Verse Closet',
       short_name: 'VerseCloset',
       lang: 'ja',

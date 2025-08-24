@@ -5,6 +5,7 @@ export default withNuxt([
   {
     rules: {
       '@typescript-eslint/unified-signatures': 'off',
+      '@stylistic/brace-style': 'off',
     },
   },
 ])

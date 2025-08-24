@@ -22,7 +22,7 @@ const editItem = (item: VerseCoordinate) => {
   }
   // コーデ名の変更をチェック
   const nameChanged = props.coordinate.name !== item.name
-  console.log('nameChanged', nameChanged)
+  // console.log('nameChanged', nameChanged)
   const transaction = database.value.db.transaction(['coordinates'], 'readwrite')
   const objectStore = transaction.objectStore('coordinates')
 
@@ -43,7 +43,7 @@ const editItem = (item: VerseCoordinate) => {
       request.addEventListener('error', () => {
         consola.error('IDBRequest<IDBValidKey> add error')
         toast.add({
-          title: 'エラーが発生しました',
+          title: 'エラーがはっせいしました',
         })
         emit('close')
       })
@@ -51,7 +51,7 @@ const editItem = (item: VerseCoordinate) => {
     request.addEventListener('error', () => {
       consola.error('IDBRequest<IDBValidKey> add error')
       toast.add({
-        title: 'エラーが発生しました',
+        title: 'エラーがはっせいしました',
       })
       emit('close')
     })
@@ -69,7 +69,7 @@ const editItem = (item: VerseCoordinate) => {
     request.addEventListener('error', () => {
       consola.error('IDBRequest<IDBValidKey> add error')
       toast.add({
-        title: 'エラーが発生しました',
+        title: 'エラーがはっせいしました',
       })
       emit('close')
     })
@@ -81,6 +81,7 @@ const editItem = (item: VerseCoordinate) => {
   <div class="register">
     <CoordinateForm
       v-model="form"
+      :disable-name="true"
       @update:model-value="editItem"
       @cancel="emit('close')"
     >

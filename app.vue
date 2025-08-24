@@ -4,40 +4,64 @@ import { consola } from 'consola'
 const runtimeConfig = useRuntimeConfig()
 const database = useDatabase()
 
+const tab = ref<'coordinates' | 'collections'>('coordinates')
+
 // IndexedDB初期化
 const request = window.indexedDB.open(runtimeConfig.public.dbName, runtimeConfig.public.dbVersion)
 request.addEventListener('success', (event) => {
-  consola.success('IDBOpenDBRequest success', event.target)
   const db = request.result
   database.value.db = db
+  consola.success(`IDBOpenDBRequest success (version: ${db.version})`, event.target)
   updateItems()
 })
 
 // 新規作成時 objectStoreを作成する
 request.addEventListener('upgradeneeded', (event) => {
-  consola.success('IDBOpenDBRequest upgradeneeded', event.target)
+  consola.success(`IDBOpenDBRequest upgradeneeded (version: ${event.oldVersion} -> ${event.newVersion})`, event.target)
   const db = request.result
   database.value.db = db
-  const objectStore = db.createObjectStore('coordinates', { keyPath: 'name' })
-  objectStore.createIndex('name', 'name', { unique: true })
-  // objectStoreの作成が完了した時
-  objectStore.transaction.addEventListener('complete', () => {
-    consola.success('IDBTransaction complete')
-  })
+
+  // Indexed DBバージョンごとに差分を適用
+  if (event.oldVersion < 1) {
+    // バージョン1: 'coordinates' オブジェクトストアを作成
+    if (!db.objectStoreNames.contains('coordinates')) {
+      const coordinatesStore = db.createObjectStore('coordinates', { keyPath: 'name' })
+      coordinatesStore.createIndex('name', 'name', { unique: true })
+      consola.success('Coordinates store created', coordinatesStore)
+    }
+  }
+
+  if (event.oldVersion < 2) {
+    // バージョン2: 'collections' オブジェクトストアを作成
+    if (!db.objectStoreNames.contains('collections')) {
+      const collectionsStore = db.createObjectStore('collections', { keyPath: 'name' })
+      collectionsStore.createIndex('name', 'name', { unique: true })
+      consola.success('Collections store created', collectionsStore)
+    }
+  }
 })
 
-/** allItemsを更新する */
+/** databaseのストアを更新する */
 const updateItems = () => {
   const db = database.value.db
   if (!db) {
     return
   }
-  const transaction = db.transaction(['coordinates'], 'readonly')
-  const objectStore = transaction.objectStore('coordinates')
-  const request = objectStore.getAll()
+  // コーデの情報を更新
+  const coordinateTransaction = db.transaction(['coordinates'], 'readonly')
+  const coordinateObjectStore = coordinateTransaction.objectStore('coordinates')
+  const request = coordinateObjectStore.getAll()
   request.addEventListener('success', (event) => {
     // @ts-expect-error event.target.result => IDBRequest.result
-    database.value.allCoordinates = event.target?.result || []
+    database.value.coordinates = event.target?.result || []
+  })
+
+  const collectionTransaction = db.transaction(['collections'], 'readonly')
+  const collectionObjectStore = collectionTransaction.objectStore('collections')
+  const collectionRequest = collectionObjectStore.getAll()
+  collectionRequest.addEventListener('success', (event) => {
+    // @ts-expect-error event.target.result => IDBRequest.result
+    database.value.collections = event.target?.result || []
   })
 }
 </script>
@@ -50,7 +74,15 @@ const updateItems = () => {
       @update-items="updateItems"
     />
 
+    <AppTabs v-model="tab" />
+
     <CoordinateList
+      v-if="tab === 'coordinates'"
+      @update-items="updateItems"
+    />
+
+    <CollectionList
+      v-if="tab === 'collections'"
       @update-items="updateItems"
     />
 
@@ -59,7 +91,7 @@ const updateItems = () => {
 </template>
 
 <style>
-@import "tailwindcss" theme(static);
+@import "tailwindcss";
 @import "@nuxt/ui";
 
 :root {
@@ -80,7 +112,7 @@ body {
   font-family: unset;
   background-color: transparent;
   min-height: 100dvh;
-  background: url('/verse-closet/bg_texture.png');
+  background: url('/bg_texture.png');
   background-size: 20rem 8rem;
   animation: bgtexture 30s infinite linear;
 }

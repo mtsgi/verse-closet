@@ -5,7 +5,6 @@ const database = useDatabase()
 
 const emit = defineEmits<{
   (e: 'close'): void
-  (e: 'error'): void
 }>()
 
 const toast = useToast()
@@ -36,7 +35,7 @@ const defaultCoordinate: VerseCoordinate = {
 
 const form = ref<VerseCoordinate>({ ...defaultCoordinate })
 
-const addItem = (item: VerseCoordinate) => {
+const addCoordinate = (item: VerseCoordinate) => {
   if (!database.value.db) {
     return
   }
@@ -54,7 +53,10 @@ const addItem = (item: VerseCoordinate) => {
   })
   request.addEventListener('error', () => {
     consola.error('IDBRequest<IDBValidKey> error')
-    emit('error')
+    toast.add({
+      title: 'コーデをとうろくできませんでした',
+    })
+    emit('close')
   })
 }
 </script>
@@ -63,7 +65,7 @@ const addItem = (item: VerseCoordinate) => {
   <div class="register">
     <CoordinateForm
       v-model="form"
-      @update:model-value="addItem"
+      @update:model-value="addCoordinate"
       @cancel="emit('close')"
     >
       <template #update>
