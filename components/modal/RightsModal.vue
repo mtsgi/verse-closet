@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import licenseNuxt from '../node_modules/nuxt/LICENSE?raw'
-import licenseVue from '../node_modules/vue/LICENSE?raw'
-import licenseNuxtUI from '../node_modules/@nuxt/ui/LICENSE.md?raw'
-// import licenseNuxtESLint from '../node_modules/@nuxt/eslint/LICENSE?raw'
-import licenseVitePWANuxt from '../node_modules/@vite-pwa/nuxt/LICENSE?raw'
-// import licenseSass from '../node_modules/sass/LICENSE?raw'
+import licenseNuxt from '../../node_modules/nuxt/LICENSE?raw'
+import licenseVue from '../../node_modules/vue/LICENSE?raw'
+import licenseNuxtUI from '../../node_modules/@nuxt/ui/LICENSE.md?raw'
+import licenseVitePWANuxt from '../../node_modules/@vite-pwa/nuxt/LICENSE?raw'
 
 const model = defineModel<boolean>()
 
@@ -16,9 +14,7 @@ const rights = [
   { name: 'Nuxt', text: licenseNuxt },
   { name: 'Vue', text: licenseVue },
   { name: 'Nuxt UI', text: licenseNuxtUI },
-  // { name: 'Nuxt ESLint', text: licenseNuxtESLint },
   { name: '@vite-pwa/nuxt', text: licenseVitePWANuxt },
-  // { name: 'Dart Sass', text: licenseSass },
 ] as const
 </script>
 
