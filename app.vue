@@ -112,7 +112,7 @@ body {
   font-family: unset;
   background-color: transparent;
   min-height: 100dvh;
-  background: url('./bg_texture.png');
+  background: url('/bg_texture.png');
   background-size: 20rem 8rem;
   animation: bgtexture 30s infinite linear;
 }
