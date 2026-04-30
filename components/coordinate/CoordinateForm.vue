@@ -15,6 +15,9 @@ const emit = defineEmits<{
 
 /** 編集中のコーデ情報 */
 const form = ref<VerseCoordinate>(props.modelValue)
+/** ブランド／タイプ: 既存データの brandName が存在すれば 'brand'、それ以外は 'type' */
+const formBrandType = ref<'brand' | 'type'>(props.modelValue.brandName ? 'brand' : 'type')
+/** コーデタイプ */
 // TODO: OTHERを追加する & 初期値をpropsから決定する
 const formSeparate = ref<'true' | 'false'>('true')
 const formFile = ref<File | undefined>(props.modelValue.file)
@@ -23,6 +26,16 @@ const formFile = ref<File | undefined>(props.modelValue.file)
 const coordinateItemTypes = ref<CoordinateItemType[]>(
   [...props.modelValue.itemType],
 )
+
+/** ブランド/タイプ切り替え時に使用しない側をクリアする */
+watch(formBrandType, (brandType) => {
+  if (brandType === 'brand') {
+    form.value.typeName = undefined
+  }
+  else {
+    form.value.brandName = undefined
+  }
+})
 
 /** セパレートタイプ切り替え時に存在しないアイテムの所持数を0にする */
 watch(formSeparate, (separateType) => {
@@ -45,6 +58,9 @@ watch(formSeparate, (separateType) => {
 const update = () => {
   const item: VerseCoordinate = {
     ...form.value,
+    // ブランド/タイプは選択中の方のみ保持する
+    brandName: formBrandType.value === 'brand' ? form.value.brandName : undefined,
+    typeName: formBrandType.value === 'type' ? form.value.typeName : undefined,
     tags: [...form.value.tags],
     pool: [...form.value.pool],
     itemType: [...coordinateItemTypes.value],
@@ -80,15 +96,48 @@ const update = () => {
       />
     </UFormField>
 
+    <UFormField class="form-field">
+      <URadioGroup
+        v-model="formBrandType"
+        orientation="horizontal"
+        :items="[
+          {
+            label: 'ブランド',
+            value: 'brand',
+          },
+          {
+            label: 'タイプ',
+            value: 'type',
+          },
+        ]"
+      />
+    </UFormField>
+
     <UFormField
+      v-if="formBrandType === 'brand'"
       class="form-field"
       label="ブランド"
     >
       <USelect
         v-model="form.brandName"
+        placeholder="えらんでね"
         size="xl"
         class="w-full"
         :items="runtimeConfig.public.brandNameList"
+      />
+    </UFormField>
+
+    <UFormField
+      v-if="formBrandType === 'type'"
+      class="form-field"
+      label="タイプ"
+    >
+      <USelect
+        v-model="form.typeName"
+        placeholder="えらんでね"
+        size="xl"
+        class="w-full"
+        :items="runtimeConfig.public.typeNameList"
       />
     </UFormField>
 
@@ -98,6 +147,7 @@ const update = () => {
     >
       <USelectMenu
         v-model="form.pool"
+        placeholder="えらんでね"
         size="xl"
         class="w-full"
         :items="runtimeConfig.public.cardPoolList"
@@ -148,12 +198,11 @@ const update = () => {
 
     <UFormField
       class="form-field"
-      label="タイプ"
+      label="コーデタイプ"
     >
       <URadioGroup
         v-model="formSeparate"
         orientation="horizontal"
-        size="xl"
         :items="[
           {
             label: 'セパレート',

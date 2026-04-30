@@ -9,7 +9,10 @@ export interface DatabaseState {
 export interface VerseCoordinate {
   name: string
   rarity: number
-  brandName: string
+  /** ブランド名（brandName または typeName のどちらかを持つ） */
+  brandName?: string
+  /** タイプ名（brandName または typeName のどちらかを持つ） */
+  typeName?: string
   /** カードプール */
   pool: string[]
   /** 画像ファイル */

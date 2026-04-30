@@ -45,6 +45,7 @@ export default defineNuxtConfig({
       appVersion: packageJson.version,
       // 以下は環境変数から読み込み
       brandNameList: String(import.meta.env.NUXT_BRAND_NAME_LIST || '').split(','),
+      typeNameList: String(import.meta.env.NUXT_TYPE_NAME_LIST || '').split(','),
       cardPoolList: String(import.meta.env.NUXT_CARD_POOL_LIST || '').split(','),
       // Nuxt Scripts
       scripts: {

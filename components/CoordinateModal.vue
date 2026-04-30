@@ -83,17 +83,29 @@ const deleteItem = async (key: string) => {
     </template>
     <template #body>
       <div class="coordinate-badges">
+        <!-- ブランド -->
         <UBadge
           v-if="props.coordinate.brandName"
           class="font-bold rounded-full"
+          icon="solar:shop-linear"
         >
           {{ props.coordinate.brandName }}
         </UBadge>
+        <!-- タイプ -->
+        <UBadge
+          v-if="props.coordinate.typeName"
+          class="font-bold rounded-full"
+          icon="solar:heart-linear"
+        >
+          {{ props.coordinate.typeName }}
+        </UBadge>
+        <!-- プール -->
         <UBadge
           v-for="pool in props.coordinate.pool"
           :key="`item-detail-pool-${pool}`"
           class="font-bold rounded-full"
           variant="outline"
+          icon="solar:folder-linear"
         >
           {{ pool }}
         </UBadge>

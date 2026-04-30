@@ -8,10 +8,13 @@ const database = useDatabase()
 const runtimeConfig = useRuntimeConfig()
 
 const dispType = ref<'default' | 'compact' | 'gallery'>('default')
+/** フィルターのブランド/タイプ切り替え（デフォルト：タイプ） */
+const formFilterBrandType = ref<'brand' | 'type'>('type')
 
 const {
   formWord,
   formBrandName,
+  formTypeName,
   formCardPool,
   formRarity,
   formCompleted,
@@ -22,8 +25,18 @@ const {
   filteredCoordinates,
 } = useCoordinateFilter(
   computed(() => database.value.coordinates),
-  { brandNameList: runtimeConfig.public.brandNameList },
+  { brandNameList: runtimeConfig.public.brandNameList, typeNameList: runtimeConfig.public.typeNameList },
 )
+
+/** フィルターラジオ切り替え時に使わない側をクリアする */
+watch(formFilterBrandType, (value) => {
+  if (value === 'brand') {
+    formTypeName.value = ''
+  }
+  else {
+    formBrandName.value = ''
+  }
+})
 </script>
 
 <template>
@@ -65,23 +78,57 @@ const {
 
       <template #content>
         <div class="filter-form">
-          <label>ブランド</label>
-          <USelect
-            v-model="formBrandName"
-            :items="runtimeConfig.public.brandNameList"
-          />
-          <UButton
-            icon="solar:close-circle-linear"
-            variant="ghost"
-            color="neutral"
-            :disabled="formBrandName === ''"
-            @click="formBrandName = ''"
-          />
+          <label>
+            {{ formFilterBrandType === 'brand' ? 'ブランド' : 'タイプ' }}
+          </label>
+          <div class="filter-radio-group">
+            <URadioGroup
+              v-model="formFilterBrandType"
+              orientation="horizontal"
+              :items="[
+                { label: 'ブランド', value: 'brand' },
+                { label: 'タイプ', value: 'type' },
+              ]"
+            />
+          </div>
+
+          <template v-if="formFilterBrandType === 'brand'">
+            <label />
+            <USelect
+              v-model="formBrandName"
+              :items="runtimeConfig.public.brandNameList"
+              placeholder="えらんでね"
+            />
+            <UButton
+              icon="solar:close-circle-linear"
+              variant="ghost"
+              color="neutral"
+              :disabled="formBrandName === ''"
+              @click="formBrandName = ''"
+            />
+          </template>
+
+          <template v-else>
+            <label />
+            <USelect
+              v-model="formTypeName"
+              :items="runtimeConfig.public.typeNameList"
+              placeholder="えらんでね"
+            />
+            <UButton
+              icon="solar:close-circle-linear"
+              variant="ghost"
+              color="neutral"
+              :disabled="formTypeName === ''"
+              @click="formTypeName = ''"
+            />
+          </template>
 
           <label>バージョン</label>
           <USelect
             v-model="formCardPool"
             :items="runtimeConfig.public.cardPoolList"
+            placeholder="えらんでね"
           />
           <UButton
             icon="solar:close-circle-linear"
@@ -95,7 +142,9 @@ const {
           <USelect
             v-model.number="formRarity"
             :items="[1, 2, 3, 4]"
+            placeholder="えらんでね"
           >
+            <!-- 選択肢の星 -->
             <template #item-label="{ item }">
               <div class="form-rarity flex">
                 <img
@@ -105,6 +154,23 @@ const {
                   alt="★"
                   class="w-5 h-5"
                 >
+              </div>
+            </template>
+            <template #default>
+              <div class="form-rarity flex">
+                <img
+                  v-for="i in formRarity"
+                  :key="`list-rarity-${formRarity}-star-${i}`"
+                  src="/star_icon.png"
+                  alt="★"
+                  class="w-5 h-5"
+                >
+                <span
+                  v-if="formRarity === undefined"
+                  class="text-sm text-dimmed"
+                >
+                  えらんでね
+                </span>
               </div>
             </template>
           </USelect>
@@ -126,6 +192,7 @@ const {
               label: 'そろってない',
               value: false,
             }]"
+            placeholder="えらんでね"
           />
           <UButton
             icon="solar:close-circle-linear"
@@ -160,6 +227,7 @@ const {
           :items="[
             { label: 'コーデのなまえ', value: 'name' },
             { label: 'ブランド', value: 'brand' },
+            { label: 'タイプ', value: 'type' },
             { label: 'レアリティ', value: 'rarity' },
           ]"
         />
@@ -257,6 +325,10 @@ const {
     label {
       font-size: 0.8rem;
     }
+
+    .filter-radio-group {
+      grid-column: span 2;
+    }
   }
 
   :deep(.form-rarity) {
@@ -266,7 +338,7 @@ const {
       flex-shrink: 0;
 
       &:not(:last-child) {
-        margin-right: -0.5rem;
+        margin-right: -0.4rem;
       }
     }
   }

@@ -1,12 +1,13 @@
 import { ref, computed, type Ref } from 'vue'
 import type { VerseCoordinate } from './useDatabase'
 
-export type CoordinateSortType = 'name' | 'brand' | 'rarity'
+export type CoordinateSortType = 'name' | 'brand' | 'type' | 'rarity'
 export type SortOrder = 'asc' | 'desc'
 
 export interface CoordinateFilterOptions {
   word?: string
   brandName?: string
+  typeName?: string
   cardPool?: string
   rarity?: number
   completed?: boolean
@@ -20,6 +21,7 @@ export function filterCoordinates(
   return coordinates.filter((coordinate) => {
     if (options.word && !coordinate.name.includes(options.word)) return false
     if (options.brandName && coordinate.brandName !== options.brandName) return false
+    if (options.typeName && coordinate.typeName !== options.typeName) return false
     if (options.cardPool && !coordinate.pool.includes(options.cardPool)) return false
     if (options.rarity !== undefined && coordinate.rarity !== options.rarity) return false
     if (options.completed !== undefined) {
@@ -36,6 +38,7 @@ export function sortCoordinates(
   sortType: CoordinateSortType,
   sortOrder: SortOrder,
   brandNameList: string[] = [],
+  typeNameList: string[] = [],
 ): VerseCoordinate[] {
   const result = [...coordinates]
   result.sort((a, b) => {
@@ -44,8 +47,16 @@ export function sortCoordinates(
       return a.name.localeCompare(b.name)
     }
     else if (sortType === 'brand') {
-      // brandNameListに入っている順
-      return brandNameList.indexOf(a.brandName) - brandNameList.indexOf(b.brandName)
+      // brandNameListに入っている順。brandNameがないコーデはリストの後ろ
+      const aIndex = a.brandName ? brandNameList.indexOf(a.brandName) : brandNameList.length
+      const bIndex = b.brandName ? brandNameList.indexOf(b.brandName) : brandNameList.length
+      return aIndex - bIndex
+    }
+    else if (sortType === 'type') {
+      // typeNameListに入っている順。typeNameがないコーデはリストの後ろ
+      const aIndex = a.typeName ? typeNameList.indexOf(a.typeName) : typeNameList.length
+      const bIndex = b.typeName ? typeNameList.indexOf(b.typeName) : typeNameList.length
+      return aIndex - bIndex
     }
     else if (sortType === 'rarity') {
       return a.rarity - b.rarity
@@ -59,10 +70,11 @@ export function sortCoordinates(
 /** コーデリストのフィルター・ソート状態を管理するcomposable */
 export const useCoordinateFilter = (
   coordinates: Ref<VerseCoordinate[]>,
-  options: { brandNameList?: string[] } = {},
+  options: { brandNameList?: string[], typeNameList?: string[] } = {},
 ) => {
   const formWord = ref('')
   const formBrandName = ref('')
+  const formTypeName = ref('')
   const formCardPool = ref('')
   const formRarity = ref<number | undefined>()
   const formCompleted = ref<boolean | undefined>()
@@ -72,6 +84,7 @@ export const useCoordinateFilter = (
   /** しぼりこみを1つでも使っているか？ */
   const filterUsing = computed<boolean>(() =>
     formBrandName.value !== ''
+    || formTypeName.value !== ''
     || formCardPool.value !== ''
     || formRarity.value !== undefined
     || formCompleted.value !== undefined,
@@ -80,6 +93,7 @@ export const useCoordinateFilter = (
   /** しぼりこみをすべて解除する */
   const clearFilter = () => {
     formBrandName.value = ''
+    formTypeName.value = ''
     formCardPool.value = ''
     formRarity.value = undefined
     formCompleted.value = undefined
@@ -90,16 +104,18 @@ export const useCoordinateFilter = (
     const filtered = filterCoordinates(coordinates.value, {
       word: formWord.value || undefined,
       brandName: formBrandName.value || undefined,
+      typeName: formTypeName.value || undefined,
       cardPool: formCardPool.value || undefined,
       rarity: formRarity.value,
       completed: formCompleted.value,
     })
-    return sortCoordinates(filtered, sortType.value, sortOrder.value, options.brandNameList)
+    return sortCoordinates(filtered, sortType.value, sortOrder.value, options.brandNameList, options.typeNameList)
   })
 
   return {
     formWord,
     formBrandName,
+    formTypeName,
     formCardPool,
     formRarity,
     formCompleted,

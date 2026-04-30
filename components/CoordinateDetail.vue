@@ -71,9 +71,24 @@ const completed = computed(() => {
           alt="★"
         >
       </div>
-      <div class="brand">
+      <!-- ブランド -->
+      <UBadge
+        v-if="props.coordinate.brandName"
+        class="brand rounded-full"
+        icon="solar:shop-linear"
+        variant="soft"
+      >
         {{ props.coordinate.brandName }}
-      </div>
+      </UBadge>
+      <!-- タイプ -->
+      <UBadge
+        v-if="props.coordinate.typeName"
+        class="type rounded-full"
+        icon="solar:heart-linear"
+        variant="soft"
+      >
+        {{ props.coordinate.typeName }}
+      </UBadge>
     </div>
 
     <!-- 名前 -->
@@ -105,7 +120,15 @@ const completed = computed(() => {
         />
       </div>
       <div class="pool">
-        {{ props.coordinate.pool.join(", ") }}
+        <UBadge
+          v-for="pool in props.coordinate.pool"
+          :key="`item-detail-pool-${pool}`"
+          class="font-bold rounded-full"
+          variant="outline"
+          icon="solar:folder-linear"
+        >
+          {{ pool }}
+        </UBadge>
       </div>
     </div>
 
@@ -226,6 +249,7 @@ const completed = computed(() => {
 
     .image,
     .rarity .brand,
+    .rarity .type,
     .items .pool {
       display: none;
     }

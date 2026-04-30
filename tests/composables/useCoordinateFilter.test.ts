@@ -116,6 +116,27 @@ describe('filterCoordinates', () => {
     expect(result).toHaveLength(1)
     expect(result[0]!.name).toBe('サマーA')
   })
+
+  it('タイプで完全一致フィルタリングができる', () => {
+    const coords = [
+      makeCoordinate({ name: 'コーデA', typeName: 'キュート' }),
+      makeCoordinate({ name: 'コーデB', typeName: 'クール' }),
+      makeCoordinate({ name: 'コーデC', typeName: 'キュート' }),
+    ]
+    const result = filterCoordinates(coords, { typeName: 'キュート' })
+    expect(result).toHaveLength(2)
+    expect(result.every(c => c.typeName === 'キュート')).toBe(true)
+  })
+
+  it('brandNameを持つコーデはタイプフィルターで除外される', () => {
+    const coords = [
+      makeCoordinate({ name: 'コーデA', brandName: 'ブランドA', typeName: undefined }),
+      makeCoordinate({ name: 'コーデB', brandName: undefined, typeName: 'キュート' }),
+    ]
+    const result = filterCoordinates(coords, { typeName: 'キュート' })
+    expect(result).toHaveLength(1)
+    expect(result[0]!.name).toBe('コーデB')
+  })
 })
 
 describe('sortCoordinates', () => {
@@ -170,9 +191,42 @@ describe('sortCoordinates', () => {
     expect(result.map(c => c.brandName)).toEqual(['ブランドC', 'ブランドB', 'ブランドA'])
   })
 
+  it('brandNameがないコーデ（typeNameのみ）はブランドソートで末尾に並ぶ', () => {
+    const brandNameList = ['ブランドA', 'ブランドB']
+    const coords = [
+      makeCoordinate({ name: 'タイプコーデ', brandName: undefined, typeName: 'キュート' }),
+      makeCoordinate({ name: 'ブランドBコーデ', brandName: 'ブランドB' }),
+      makeCoordinate({ name: 'ブランドAコーデ', brandName: 'ブランドA' }),
+    ]
+    const result = sortCoordinates(coords, 'brand', 'desc', brandNameList)
+    expect(result[result.length - 1]!.name).toBe('タイプコーデ')
+  })
+
   it('元の配列を変更しない（イミュータブル）', () => {
     const coords = [makeCoordinate({ name: 'B' }), makeCoordinate({ name: 'A' })]
     sortCoordinates(coords, 'name', 'asc')
     expect(coords[0]!.name).toBe('B')
+  })
+
+  it('タイプリストの順にソートできる', () => {
+    const typeNameList = ['キュート', 'クール', 'ポップ']
+    const coords = [
+      makeCoordinate({ name: 'コーデC', brandName: undefined, typeName: 'ポップ' }),
+      makeCoordinate({ name: 'コーデA', brandName: undefined, typeName: 'キュート' }),
+      makeCoordinate({ name: 'コーデB', brandName: undefined, typeName: 'クール' }),
+    ]
+    const result = sortCoordinates(coords, 'type', 'asc', [], typeNameList)
+    expect(result.map(c => c.typeName)).toEqual(['ポップ', 'クール', 'キュート'])
+  })
+
+  it('typeNameがないコーデ（brandNameのみ）はタイプソートで末尾に並ぶ', () => {
+    const typeNameList = ['キュート', 'クール']
+    const coords = [
+      makeCoordinate({ name: 'ブランドコーデ', brandName: 'ブランドA', typeName: undefined }),
+      makeCoordinate({ name: 'クールコーデ', brandName: undefined, typeName: 'クール' }),
+      makeCoordinate({ name: 'キュートコーデ', brandName: undefined, typeName: 'キュート' }),
+    ]
+    const result = sortCoordinates(coords, 'type', 'desc', [], typeNameList)
+    expect(result[result.length - 1]!.name).toBe('ブランドコーデ')
   })
 })
