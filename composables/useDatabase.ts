@@ -1,5 +1,5 @@
-/** `useDatabse` の中身 */
-interface DatabaseState {
+/** `useDatabase` の中身 */
+export interface DatabaseState {
   db: null | IDBDatabase
   coordinates: VerseCoordinate[]
   collections: VerseCollection[]
@@ -9,7 +9,10 @@ interface DatabaseState {
 export interface VerseCoordinate {
   name: string
   rarity: number
-  brandName: string
+  /** ブランド名（brandName または typeName のどちらかを持つ） */
+  brandName?: string
+  /** タイプ名（brandName または typeName のどちらかを持つ） */
+  typeName?: string
   /** カードプール */
   pool: string[]
   /** 画像ファイル */

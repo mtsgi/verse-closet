@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { consola } from 'consola'
-
 const props = defineProps<{
   modelValue: boolean
   coordinate: VerseCoordinate
@@ -15,6 +13,7 @@ const emit = defineEmits<{
 
 const database = useDatabase()
 const toast = useToast()
+const { updateCoordinateItem, deleteCoordinate } = useCoordinatesDB(database)
 
 /** 削除確認モーダルの表示状態 */
 const openDeleteModal = ref(false)
@@ -38,66 +37,28 @@ const imageURL = computed(() => {
 })
 
 /** アイテムの所持数を更新する */
-const updateItemNumber = (itemType: CoordinateItemType, value: boolean) => {
-  const db = database.value.db
-  if (!db) {
-    return
-  }
-  const transaction = db.transaction(['coordinates'], 'readwrite')
-  const objectStore = transaction.objectStore('coordinates')
-  // 複製する
-  const item: VerseCoordinate = {
-    ...props.coordinate,
-    tags: [...props.coordinate.tags],
-    pool: [...props.coordinate.pool],
-    itemType: [...props.coordinate.itemType],
-    items: {
-      tops: { ...props.coordinate.items.tops },
-      bottoms: { ...props.coordinate.items.bottoms },
-      onepiece: { ...props.coordinate.items.onepiece },
-      shoes: { ...props.coordinate.items.shoes },
-      accessory: { ...props.coordinate.items.accessory },
-    },
-  }
-  // 対象のアイテムの個数を更新する
-  item.items[itemType].number = value ? 1 : 0
-  const request = objectStore.put(item)
-  request.addEventListener('success', () => {
-    consola.success('IDBRequest<IDBValidKey> success')
+const updateItemNumber = async (itemType: CoordinateItemType, value: boolean) => {
+  try {
+    await updateCoordinateItem(props.coordinate.name, itemType, value)
     emit('update-items')
-  })
-  request.addEventListener('error', () => {
-    consola.error('IDBRequest<IDBValidKey> add error')
-    toast.add({
-      title: 'エラーが発生しました',
-    })
+  }
+  catch {
+    toast.add({ title: 'エラーが発生しました' })
     emit('close-modal')
-  })
+  }
 }
 
-const deleteItem = (key: string) => {
-  const db = database.value.db
-  if (!db) {
-    return
-  }
-  const transaction = db.transaction(['coordinates'], 'readwrite')
-  const objectStore = transaction.objectStore('coordinates')
-  const request = objectStore.delete(key)
-  request.addEventListener('success', () => {
-    toast.add({
-      title: 'コーデをさくじょしました',
-    })
-    consola.success('IDBRequest<undefined> success')
+const deleteItem = async (key: string) => {
+  try {
+    await deleteCoordinate(key)
+    toast.add({ title: 'コーデをさくじょしました' })
     emit('update-items')
     emit('close-modal')
-  })
-  request.addEventListener('error', () => {
-    toast.add({
-      title: 'エラーがはっせいしました',
-    })
-    consola.error('IDBRequest<undefined> error')
+  }
+  catch {
+    toast.add({ title: 'エラーがはっせいしました' })
     emit('error')
-  })
+  }
 }
 </script>
 
@@ -110,7 +71,10 @@ const deleteItem = (key: string) => {
     @update:open="(value: boolean) => emit('update:modelValue', value)"
   >
     <template #title>
-      <div class="coordinate-rarity">
+      <div
+        v-if="props.coordinate.rarity > 0"
+        class="coordinate-rarity"
+      >
         <img
           v-for="i in props.coordinate.rarity"
           :key="`item-detail-rarity-star-${i}`"
@@ -118,21 +82,44 @@ const deleteItem = (key: string) => {
           alt="★"
         >
       </div>
+      <!-- スペシャルの場合 -->
+      <div
+        v-else
+        class="coordinate-rarity"
+      >
+        <UBadge
+          v-if="props.coordinate.rarity === -1"
+          label="スペシャル"
+          color="warning"
+        />
+      </div>
       {{ props.coordinate.name }}
     </template>
     <template #body>
       <div class="coordinate-badges">
+        <!-- ブランド -->
         <UBadge
           v-if="props.coordinate.brandName"
           class="font-bold rounded-full"
+          icon="solar:shop-linear"
         >
           {{ props.coordinate.brandName }}
         </UBadge>
+        <!-- タイプ -->
+        <UBadge
+          v-if="props.coordinate.typeName"
+          class="font-bold rounded-full"
+          icon="solar:heart-linear"
+        >
+          {{ props.coordinate.typeName }}
+        </UBadge>
+        <!-- プール -->
         <UBadge
           v-for="pool in props.coordinate.pool"
           :key="`item-detail-pool-${pool}`"
           class="font-bold rounded-full"
           variant="outline"
+          icon="solar:folder-linear"
         >
           {{ pool }}
         </UBadge>
@@ -156,7 +143,7 @@ const deleteItem = (key: string) => {
           size="xl"
           :label="itemType"
           :model-value="props.coordinate.items[itemType].number > 0"
-          @update:model-value="(value) => updateItemNumber(itemType, value)"
+          @update:model-value="(value) => updateItemNumber(itemType, Boolean(value))"
         >
           <template #label>
             <CoordinateItemIcon

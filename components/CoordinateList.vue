@@ -7,82 +7,35 @@ const emit = defineEmits<{
 const database = useDatabase()
 const runtimeConfig = useRuntimeConfig()
 
-const formWord = ref<string>('')
-const formBrandName = ref<string>('')
-const formCardPool = ref<string>('')
-const formRarity = ref<number | undefined>()
-const formCompleted = ref<boolean | undefined>()
 const dispType = ref<'default' | 'compact' | 'gallery'>('default')
-const sortType = ref<'name' | 'brand' | 'rarity'>('name')
-const sortOrder = ref<'asc' | 'desc'>('desc')
+/** フィルターのブランド/タイプ切り替え（デフォルト：タイプ） */
+const formFilterBrandType = ref<'brand' | 'type'>('type')
 
-/** しぼりこみを1つでも使っているか？ */
-const filterUsing = computed<boolean>(() => {
-  return formBrandName.value !== ''
-    || formCardPool.value !== ''
-    || formRarity.value !== undefined
-    || formCompleted.value !== undefined
-})
+const {
+  formWord,
+  formBrandName,
+  formTypeName,
+  formCardPool,
+  formRarity,
+  formCompleted,
+  sortType,
+  sortOrder,
+  filterUsing,
+  clearFilter,
+  filteredCoordinates,
+} = useCoordinateFilter(
+  computed(() => database.value.coordinates),
+  { brandNameList: runtimeConfig.public.brandNameList, typeNameList: runtimeConfig.public.typeNameList, cardPoolList: runtimeConfig.public.cardPoolList },
+)
 
-/** しぼりこみをすべて解除する */
-const clearFilter = () => {
-  formBrandName.value = ''
-  formCardPool.value = ''
-  formRarity.value = undefined
-  formCompleted.value = undefined
-}
-
-/** けんさく＆しぼりこみ＆ならびかえを適用したコーデリスト */
-const filteredCoordinates = computed<VerseCoordinate[]>(() => {
-  const result = database.value.coordinates.filter((coordinate) => {
-    let flag = true
-    // けんさくワード
-    if (flag && formWord.value !== '') {
-      flag = coordinate.name.includes(formWord.value)
-    }
-    // ブランド
-    if (flag && formBrandName.value !== '') {
-      flag = coordinate.brandName === formBrandName.value
-    }
-    // バージョン
-    if (flag && formCardPool.value !== '') {
-      flag = coordinate.pool.includes(formCardPool.value)
-    }
-    // レアリティ
-    if (flag && formRarity.value !== undefined) {
-      flag = coordinate.rarity === formRarity.value
-    }
-    // フルコーデ
-    if (flag && formCompleted.value !== undefined) {
-      const completed = coordinate.itemType.every((item) => {
-        return coordinate.items[item].number > 0
-      })
-      flag = completed === formCompleted.value
-    }
-
-    return flag
-  })
-
-  // ならびかえ
-  result.sort((a, b) => {
-    if (sortType.value === 'name') {
-      // NOTE: ひらがな・カタカナは同列になる
-      return a.name.localeCompare(b.name)
-    } else if (sortType.value === 'brand') {
-      // brandNameListに入っている順
-      return runtimeConfig.public.brandNameList.indexOf(a.brandName) -
-        runtimeConfig.public.brandNameList.indexOf(b.brandName)
-    } else if (sortType.value === 'rarity') {
-      return a.rarity - b.rarity
-    }
-    return 0
-  })
-
-  if (sortOrder.value === 'asc') {
-    result.reverse()
+/** フィルターラジオ切り替え時に使わない側をクリアする */
+watch(formFilterBrandType, (value) => {
+  if (value === 'brand') {
+    formTypeName.value = ''
   }
-
-  return result
+  else {
+    formBrandName.value = ''
+  }
 })
 </script>
 
@@ -125,23 +78,57 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
 
       <template #content>
         <div class="filter-form">
-          <label>ブランド</label>
-          <USelect
-            v-model="formBrandName"
-            :items="runtimeConfig.public.brandNameList"
-          />
-          <UButton
-            icon="solar:close-circle-linear"
-            variant="ghost"
-            color="neutral"
-            :disabled="formBrandName === ''"
-            @click="formBrandName = ''"
-          />
+          <label>
+            {{ formFilterBrandType === 'brand' ? 'ブランド' : 'タイプ' }}
+          </label>
+          <div class="filter-radio-group">
+            <URadioGroup
+              v-model="formFilterBrandType"
+              orientation="horizontal"
+              :items="[
+                { label: 'ブランド', value: 'brand' },
+                { label: 'タイプ', value: 'type' },
+              ]"
+            />
+          </div>
+
+          <template v-if="formFilterBrandType === 'brand'">
+            <label />
+            <USelect
+              v-model="formBrandName"
+              :items="runtimeConfig.public.brandNameList"
+              placeholder="えらんでね"
+            />
+            <UButton
+              icon="solar:close-circle-linear"
+              variant="ghost"
+              color="neutral"
+              :disabled="formBrandName === ''"
+              @click="formBrandName = ''"
+            />
+          </template>
+
+          <template v-else>
+            <label />
+            <USelect
+              v-model="formTypeName"
+              :items="runtimeConfig.public.typeNameList"
+              placeholder="えらんでね"
+            />
+            <UButton
+              icon="solar:close-circle-linear"
+              variant="ghost"
+              color="neutral"
+              :disabled="formTypeName === ''"
+              @click="formTypeName = ''"
+            />
+          </template>
 
           <label>バージョン</label>
           <USelect
             v-model="formCardPool"
             :items="runtimeConfig.public.cardPoolList"
+            placeholder="えらんでね"
           />
           <UButton
             icon="solar:close-circle-linear"
@@ -154,17 +141,52 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
           <label>レアリティ</label>
           <USelect
             v-model.number="formRarity"
-            :items="[1, 2, 3, 4]"
+            :items="[-1, 1, 2, 3, 4]"
+            placeholder="えらんでね"
           >
+            <!-- 選択肢の星 -->
             <template #item-label="{ item }">
               <div class="form-rarity flex">
-                <img
-                  v-for="i in item"
-                  :key="`list-rarity-${item}-star-${i}`"
-                  src="/star_icon.png"
-                  alt="★"
-                  class="w-5 h-5"
-                >
+                <template v-if="item === -1">
+                  <UBadge
+                    label="スペシャル"
+                    color="warning"
+                  />
+                </template>
+                <template v-else>
+                  <img
+                    v-for="i in item"
+                    :key="`list-rarity-${item}-star-${i}`"
+                    src="/star_icon.png"
+                    alt="★"
+                    class="w-5 h-5"
+                  >
+                </template>
+              </div>
+            </template>
+            <template #default>
+              <div class="form-rarity flex">
+                <template v-if="formRarity === -1">
+                  <UBadge
+                    label="スペシャル"
+                    color="warning"
+                  />
+                </template>
+                <template v-else>
+                  <img
+                    v-for="i in formRarity"
+                    :key="`list-rarity-${formRarity}-star-${i}`"
+                    src="/star_icon.png"
+                    alt="★"
+                    class="w-5 h-5"
+                  >
+                  <span
+                    v-if="formRarity === undefined"
+                    class="text-sm text-dimmed"
+                  >
+                    えらんでね
+                  </span>
+                </template>
               </div>
             </template>
           </USelect>
@@ -186,6 +208,7 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
               label: 'そろってない',
               value: false,
             }]"
+            placeholder="えらんでね"
           />
           <UButton
             icon="solar:close-circle-linear"
@@ -208,7 +231,7 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
 
     <!-- ならびかえと表示タイプ -->
     <div class="disp-menu">
-      <UButtonGroup>
+      <UFieldGroup>
         <UButton
           color="neutral"
           variant="outline"
@@ -220,14 +243,16 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
           :items="[
             { label: 'コーデのなまえ', value: 'name' },
             { label: 'ブランド', value: 'brand' },
+            { label: 'タイプ', value: 'type' },
             { label: 'レアリティ', value: 'rarity' },
+            { label: 'バージョン', value: 'pool' },
           ]"
         />
-      </UButtonGroup>
+      </UFieldGroup>
 
       <div class="separator" />
 
-      <UButtonGroup>
+      <UFieldGroup>
         <UButton
           :variant="dispType === 'default' ? 'solid' : 'outline'"
           icon="material-symbols:lists"
@@ -243,7 +268,7 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
           icon="material-symbols:grid-view-outline"
           @click="dispType = 'gallery'"
         />
-      </UButtonGroup>
+      </UFieldGroup>
     </div>
   </div>
 
@@ -317,6 +342,10 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
     label {
       font-size: 0.8rem;
     }
+
+    .filter-radio-group {
+      grid-column: span 2;
+    }
   }
 
   :deep(.form-rarity) {
@@ -326,7 +355,7 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
       flex-shrink: 0;
 
       &:not(:last-child) {
-        margin-right: -0.5rem;
+        margin-right: -0.4rem;
       }
     }
   }

@@ -63,7 +63,10 @@ const completed = computed(() => {
 
     <!-- レアリティとブランド名 -->
     <div class="rarity">
-      <div class="stars">
+      <div
+        v-if="props.coordinate.rarity > 0"
+        class="stars"
+      >
         <img
           v-for="i in props.coordinate.rarity"
           :key="`item-detail-rarity-star-${i}`"
@@ -71,9 +74,35 @@ const completed = computed(() => {
           alt="★"
         >
       </div>
-      <div class="brand">
-        {{ props.coordinate.brandName }}
+      <!-- スペシャルの場合 -->
+      <div
+        v-else
+        class="stars"
+      >
+        <UBadge
+          v-if="props.coordinate.rarity === -1"
+          label="スペシャル"
+          color="warning"
+        />
       </div>
+      <!-- ブランド -->
+      <UBadge
+        v-if="props.coordinate.brandName"
+        class="brand rounded-full"
+        icon="solar:shop-linear"
+        variant="soft"
+      >
+        {{ props.coordinate.brandName }}
+      </UBadge>
+      <!-- タイプ -->
+      <UBadge
+        v-if="props.coordinate.typeName"
+        class="type rounded-full"
+        icon="solar:heart-linear"
+        variant="soft"
+      >
+        {{ props.coordinate.typeName }}
+      </UBadge>
     </div>
 
     <!-- 名前 -->
@@ -105,7 +134,15 @@ const completed = computed(() => {
         />
       </div>
       <div class="pool">
-        {{ props.coordinate.pool.join(", ") }}
+        <UBadge
+          v-for="pool in props.coordinate.pool"
+          :key="`item-detail-pool-${pool}`"
+          class="font-bold rounded-full"
+          variant="outline"
+          icon="solar:folder-linear"
+        >
+          {{ pool }}
+        </UBadge>
       </div>
     </div>
 
@@ -226,6 +263,7 @@ const completed = computed(() => {
 
     .image,
     .rarity .brand,
+    .rarity .type,
     .items .pool {
       display: none;
     }

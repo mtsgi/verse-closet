@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { consola } from 'consola'
-
 const database = useDatabase()
 const toast = useToast()
+const { updateCollectionCoordinates } = useCollectionsDB(database)
 
 const props = defineProps<{
   coordinate: VerseCoordinate
@@ -14,38 +13,14 @@ const emit = defineEmits<{
 }>()
 
 /** コレクションに該当コーデを追加／削除する */
-const updateCollectionStatus = (collectionName: string, value: boolean) => {
-  const db = database.value.db
-  if (!db) {
-    return
-  }
-  const transaction = db.transaction(['collections'], 'readwrite')
-  const objectStore = transaction.objectStore('collections')
-  // 複製する
-  const collection = database.value.collections.find((collection) => {
-    return collection.name === collectionName
-  })
-  if (!collection) {
-    return
-  }
-  const newCollection: VerseCollection = {
-    ...collection,
-    // チェックした時は配列に追加、外した時は配列から削除
-    coordinates: value
-      ? [...collection.coordinates, props.coordinate.name]
-      : collection.coordinates.filter(name => name !== props.coordinate.name),
-  }
-  const request = objectStore.put(newCollection)
-  request.addEventListener('success', () => {
-    consola.success('IDBRequest<IDBValidKey> success')
+const updateCollectionStatus = async (collectionName: string, value: boolean) => {
+  try {
+    await updateCollectionCoordinates(collectionName, props.coordinate.name, value)
     emit('update-items')
-  })
-  request.addEventListener('error', () => {
-    consola.error('IDBRequest<IDBValidKey> add error')
-    toast.add({
-      title: 'こうしんできませんでした',
-    })
-  })
+  }
+  catch {
+    toast.add({ title: 'こうしんできませんでした' })
+  }
 }
 </script>
 
@@ -61,7 +36,7 @@ const updateCollectionStatus = (collectionName: string, value: boolean) => {
         size="xl"
         :label="collection.name"
         :model-value="collection.coordinates.includes(props.coordinate.name)"
-        @update:model-value="(value) => updateCollectionStatus(collection.name, value)"
+        @update:model-value="(value) => updateCollectionStatus(collection.name, Boolean(value))"
       >
         <template #label>
           {{ collection.name }}

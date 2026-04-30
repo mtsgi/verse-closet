@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { consola } from 'consola'
-
 const database = useDatabase()
+const { updateCoordinate, renameCoordinate } = useCoordinatesDB(database)
 
 const props = defineProps<{
   coordinate: VerseCoordinate
@@ -16,63 +15,21 @@ const toast = useToast()
 
 const form = ref<VerseCoordinate>({ ...props.coordinate })
 
-const editItem = (item: VerseCoordinate) => {
-  if (!database.value.db) {
-    return
+const editItem = async (item: VerseCoordinate) => {
+  try {
+    const nameChanged = props.coordinate.name !== item.name
+    if (nameChanged) {
+      await renameCoordinate(props.coordinate.name, item)
+    }
+    else {
+      await updateCoordinate(item)
+    }
+    toast.add({ title: 'コーデをへんしゅうしました' })
+    emit('edit')
   }
-  // コーデ名の変更をチェック
-  const nameChanged = props.coordinate.name !== item.name
-  // console.log('nameChanged', nameChanged)
-  const transaction = database.value.db.transaction(['coordinates'], 'readwrite')
-  const objectStore = transaction.objectStore('coordinates')
-
-  if (nameChanged) {
-    // コーデのなまえが変更されている場合はaddしてremove
-    const originalName = props.coordinate.name
-    const request = objectStore.add(item)
-    request.addEventListener('success', () => {
-      consola.success('IDBRequest<IDBValidKey> add success')
-      const request = objectStore.delete(originalName)
-      request.addEventListener('success', () => {
-        consola.success('IDBRequest<IDBValidKey> delete success')
-        toast.add({
-          title: 'コーデをへんしゅうしました',
-        })
-        emit('edit')
-      })
-      request.addEventListener('error', () => {
-        consola.error('IDBRequest<IDBValidKey> add error')
-        toast.add({
-          title: 'エラーがはっせいしました',
-        })
-        emit('close')
-      })
-    })
-    request.addEventListener('error', () => {
-      consola.error('IDBRequest<IDBValidKey> add error')
-      toast.add({
-        title: 'エラーがはっせいしました',
-      })
-      emit('close')
-    })
-  }
-  else {
-    // コーデのなまえが変更されていない場合はputする
-    const request = objectStore.put(item)
-    request.addEventListener('success', () => {
-      consola.success('IDBRequest<IDBValidKey> put success')
-      toast.add({
-        title: 'コーデをへんしゅうしました',
-      })
-      emit('edit')
-    })
-    request.addEventListener('error', () => {
-      consola.error('IDBRequest<IDBValidKey> add error')
-      toast.add({
-        title: 'エラーがはっせいしました',
-      })
-      emit('close')
-    })
+  catch {
+    toast.add({ title: 'エラーがはっせいしました' })
+    emit('close')
   }
 }
 </script>

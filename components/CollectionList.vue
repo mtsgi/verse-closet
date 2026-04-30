@@ -8,32 +8,9 @@ const database = useDatabase()
 /** 追加フォームの表示状態 */
 const openForm = ref<boolean>(false)
 
-const sortType = ref<'name' | 'count' | 'createdAt'>('name')
-const sortOrder = ref<'asc' | 'desc'>('asc')
-
-/** ならびかえを適用したコレクションリスト */
-const filteredCollections = computed<VerseCollection[]>(() => {
-  // NOTE: しぼりこみを実装するならここで
-  const result = [...database.value.collections]
-
-  // ならびかえ
-  result.sort((a, b) => {
-    if (sortType.value === 'name') {
-      return a.name.localeCompare(b.name)
-    } else if (sortType.value === 'count') {
-      return b.coordinates.length - a.coordinates.length
-    } else if (sortType.value === 'createdAt') {
-      return b.createdAt.getTime() - a.createdAt.getTime()
-    }
-    return 0
-  })
-
-  if (sortOrder.value === 'desc') {
-    return result.reverse()
-  }
-
-  return result
-})
+const { sortType, sortOrder, filteredCollections } = useCollectionFilter(
+  computed(() => database.value.collections),
+)
 
 const onClose = () => {
   emit('update-items')
@@ -44,7 +21,7 @@ const onClose = () => {
 <template>
   <div class="collection-list">
     <div class="disp-menu">
-      <UButtonGroup>
+      <UFieldGroup>
         <UButton
           color="neutral"
           variant="outline"
@@ -59,7 +36,7 @@ const onClose = () => {
             { label: 'つくったひ', value: 'createdAt' },
           ]"
         />
-      </UButtonGroup>
+      </UFieldGroup>
 
       <div class="separator" />
     </div>
