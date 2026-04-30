@@ -71,13 +71,27 @@ const deleteItem = async (key: string) => {
     @update:open="(value: boolean) => emit('update:modelValue', value)"
   >
     <template #title>
-      <div class="coordinate-rarity">
+      <div
+        v-if="props.coordinate.rarity > 0"
+        class="coordinate-rarity"
+      >
         <img
           v-for="i in props.coordinate.rarity"
           :key="`item-detail-rarity-star-${i}`"
           src="/star_icon.png"
           alt="★"
         >
+      </div>
+      <!-- スペシャルの場合 -->
+      <div
+        v-else
+        class="coordinate-rarity"
+      >
+        <UBadge
+          v-if="props.coordinate.rarity === -1"
+          label="スペシャル"
+          color="warning"
+        />
       </div>
       {{ props.coordinate.name }}
     </template>

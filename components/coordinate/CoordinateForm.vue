@@ -172,19 +172,24 @@ const update = () => {
     >
       <UFieldGroup>
         <UButton
-          v-for="num in [1, 2, 3, 4]"
+          v-for="num in [1, 2, 3, 4, -1]"
           :key="`register-rarity-${num}`"
           size="xl"
           :variant="form.rarity === num ? 'solid' : 'outline'"
           class="form-field-rarity"
           @click="form.rarity = num"
         >
-          <img
-            v-for="i in num"
-            :key="`register-rarity-${num}-star-${i}`"
-            src="/star_icon.png"
-            alt="★"
-          >
+          <template v-if="num === -1">
+            スペシャル
+          </template>
+          <template v-else>
+            <img
+              v-for="i in num"
+              :key="`register-rarity-${num}-star-${i}`"
+              src="/star_icon.png"
+              alt="★"
+            >
+          </template>
         </UButton>
       </UFieldGroup>
     </UFormField>

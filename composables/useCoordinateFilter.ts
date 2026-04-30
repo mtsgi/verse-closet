@@ -1,7 +1,7 @@
 import { ref, computed, type Ref } from 'vue'
 import type { VerseCoordinate } from './useDatabase'
 
-export type CoordinateSortType = 'name' | 'brand' | 'type' | 'rarity'
+export type CoordinateSortType = 'name' | 'brand' | 'type' | 'rarity' | 'pool'
 export type SortOrder = 'asc' | 'desc'
 
 export interface CoordinateFilterOptions {
@@ -39,6 +39,7 @@ export function sortCoordinates(
   sortOrder: SortOrder,
   brandNameList: string[] = [],
   typeNameList: string[] = [],
+  cardPoolList: string[] = [],
 ): VerseCoordinate[] {
   const result = [...coordinates]
   result.sort((a, b) => {
@@ -61,6 +62,16 @@ export function sortCoordinates(
     else if (sortType === 'rarity') {
       return a.rarity - b.rarity
     }
+    else if (sortType === 'pool') {
+      // poolが複数ある場合はcardPoolListの最小インデックスを使う。poolなしはリストの後ろ
+      const aIndex = a.pool.length > 0
+        ? Math.min(...a.pool.map(p => cardPoolList.indexOf(p) === -1 ? cardPoolList.length : cardPoolList.indexOf(p)))
+        : cardPoolList.length
+      const bIndex = b.pool.length > 0
+        ? Math.min(...b.pool.map(p => cardPoolList.indexOf(p) === -1 ? cardPoolList.length : cardPoolList.indexOf(p)))
+        : cardPoolList.length
+      return aIndex - bIndex
+    }
     return 0
   })
   if (sortOrder === 'asc') result.reverse()
@@ -70,7 +81,7 @@ export function sortCoordinates(
 /** コーデリストのフィルター・ソート状態を管理するcomposable */
 export const useCoordinateFilter = (
   coordinates: Ref<VerseCoordinate[]>,
-  options: { brandNameList?: string[], typeNameList?: string[] } = {},
+  options: { brandNameList?: string[], typeNameList?: string[], cardPoolList?: string[] } = {},
 ) => {
   const formWord = ref('')
   const formBrandName = ref('')
@@ -109,7 +120,7 @@ export const useCoordinateFilter = (
       rarity: formRarity.value,
       completed: formCompleted.value,
     })
-    return sortCoordinates(filtered, sortType.value, sortOrder.value, options.brandNameList, options.typeNameList)
+    return sortCoordinates(filtered, sortType.value, sortOrder.value, options.brandNameList, options.typeNameList, options.cardPoolList)
   })
 
   return {

@@ -73,6 +73,17 @@ describe('filterCoordinates', () => {
     expect(result.every(c => c.rarity === 1)).toBe(true)
   })
 
+  it('スペシャル(rarity: -1)でフィルタリングができる', () => {
+    const coords = [
+      makeCoordinate({ name: 'スペシャルコーデ', rarity: -1 }),
+      makeCoordinate({ name: '通常コーデA', rarity: 1 }),
+      makeCoordinate({ name: '通常コーデB', rarity: 2 }),
+    ]
+    const result = filterCoordinates(coords, { rarity: -1 })
+    expect(result).toHaveLength(1)
+    expect(result[0]!.name).toBe('スペシャルコーデ')
+  })
+
   it('完了状態（フルコーデ）でフィルタリングができる', () => {
     const completedCoord = makeCoordinate({
       name: 'フルコーデ',
@@ -170,6 +181,28 @@ describe('sortCoordinates', () => {
     expect(result.map(c => c.rarity)).toEqual([3, 2, 1])
   })
 
+  it('スペシャル(rarity: -1)は昇順レアリティソートで末尾に並ぶ', () => {
+    const coords = [
+      makeCoordinate({ name: 'SP', rarity: -1 }),
+      makeCoordinate({ name: '★★', rarity: 2 }),
+      makeCoordinate({ name: '★', rarity: 1 }),
+    ]
+    const result = sortCoordinates(coords, 'rarity', 'asc')
+    // 昇順(asc)はresult.reverse()されるので、数値降順 → -1が末尾
+    expect(result[result.length - 1]!.rarity).toBe(-1)
+  })
+
+  it('スペシャル(rarity: -1)は降順レアリティソートで先頭に並ぶ', () => {
+    const coords = [
+      makeCoordinate({ name: 'SP', rarity: -1 }),
+      makeCoordinate({ name: '★★', rarity: 2 }),
+      makeCoordinate({ name: '★', rarity: 1 }),
+    ]
+    const result = sortCoordinates(coords, 'rarity', 'desc')
+    // 降順(desc)はそのまま数値昇順なので -1 が先頭
+    expect(result[0]!.rarity).toBe(-1)
+  })
+
   it('レアリティの降順でソートできる', () => {
     const coords = [
       makeCoordinate({ name: 'C', rarity: 3 }),
@@ -228,5 +261,50 @@ describe('sortCoordinates', () => {
     ]
     const result = sortCoordinates(coords, 'type', 'desc', [], typeNameList)
     expect(result[result.length - 1]!.name).toBe('ブランドコーデ')
+  })
+
+  it('バージョンリストの順（昇順）にソートできる', () => {
+    const cardPoolList = ['バージョン1', 'バージョン2', 'バージョン3']
+    const coords = [
+      makeCoordinate({ name: 'コーデC', pool: ['バージョン3'] }),
+      makeCoordinate({ name: 'コーデA', pool: ['バージョン1'] }),
+      makeCoordinate({ name: 'コーデB', pool: ['バージョン2'] }),
+    ]
+    const result = sortCoordinates(coords, 'pool', 'asc', [], [], cardPoolList)
+    expect(result.map(c => c.name)).toEqual(['コーデC', 'コーデB', 'コーデA'])
+  })
+
+  it('バージョンリストの順（降順）にソートできる', () => {
+    const cardPoolList = ['バージョン1', 'バージョン2', 'バージョン3']
+    const coords = [
+      makeCoordinate({ name: 'コーデC', pool: ['バージョン3'] }),
+      makeCoordinate({ name: 'コーデA', pool: ['バージョン1'] }),
+      makeCoordinate({ name: 'コーデB', pool: ['バージョン2'] }),
+    ]
+    const result = sortCoordinates(coords, 'pool', 'desc', [], [], cardPoolList)
+    expect(result.map(c => c.name)).toEqual(['コーデA', 'コーデB', 'コーデC'])
+  })
+
+  it('poolがないコーデはバージョンソートで末尾に並ぶ', () => {
+    const cardPoolList = ['バージョン1', 'バージョン2']
+    const coords = [
+      makeCoordinate({ name: 'プールなし', pool: [] }),
+      makeCoordinate({ name: 'バージョン2コーデ', pool: ['バージョン2'] }),
+      makeCoordinate({ name: 'バージョン1コーデ', pool: ['バージョン1'] }),
+    ]
+    const result = sortCoordinates(coords, 'pool', 'desc', [], [], cardPoolList)
+    expect(result[result.length - 1]!.name).toBe('プールなし')
+  })
+
+  it('複数poolを持つコーデは最小インデックスで並ぶ', () => {
+    const cardPoolList = ['バージョン1', 'バージョン2', 'バージョン3']
+    const coords = [
+      makeCoordinate({ name: '複数pool', pool: ['バージョン3', 'バージョン1'] }),
+      makeCoordinate({ name: 'バージョン2のみ', pool: ['バージョン2'] }),
+    ]
+    // 複数poolの最小インデックスはバージョン1(0)、バージョン2のみはインデックス1
+    // 降順(desc)はreverseしないため、インデックスが小さい方が先頭（複数pool→バージョン2のみ）
+    const result = sortCoordinates(coords, 'pool', 'desc', [], [], cardPoolList)
+    expect(result.map(c => c.name)).toEqual(['複数pool', 'バージョン2のみ'])
   })
 })

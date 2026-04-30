@@ -25,7 +25,7 @@ const {
   filteredCoordinates,
 } = useCoordinateFilter(
   computed(() => database.value.coordinates),
-  { brandNameList: runtimeConfig.public.brandNameList, typeNameList: runtimeConfig.public.typeNameList },
+  { brandNameList: runtimeConfig.public.brandNameList, typeNameList: runtimeConfig.public.typeNameList, cardPoolList: runtimeConfig.public.cardPoolList },
 )
 
 /** フィルターラジオ切り替え時に使わない側をクリアする */
@@ -141,36 +141,52 @@ watch(formFilterBrandType, (value) => {
           <label>レアリティ</label>
           <USelect
             v-model.number="formRarity"
-            :items="[1, 2, 3, 4]"
+            :items="[-1, 1, 2, 3, 4]"
             placeholder="えらんでね"
           >
             <!-- 選択肢の星 -->
             <template #item-label="{ item }">
               <div class="form-rarity flex">
-                <img
-                  v-for="i in item"
-                  :key="`list-rarity-${item}-star-${i}`"
-                  src="/star_icon.png"
-                  alt="★"
-                  class="w-5 h-5"
-                >
+                <template v-if="item === -1">
+                  <UBadge
+                    label="スペシャル"
+                    color="warning"
+                  />
+                </template>
+                <template v-else>
+                  <img
+                    v-for="i in item"
+                    :key="`list-rarity-${item}-star-${i}`"
+                    src="/star_icon.png"
+                    alt="★"
+                    class="w-5 h-5"
+                  >
+                </template>
               </div>
             </template>
             <template #default>
               <div class="form-rarity flex">
-                <img
-                  v-for="i in formRarity"
-                  :key="`list-rarity-${formRarity}-star-${i}`"
-                  src="/star_icon.png"
-                  alt="★"
-                  class="w-5 h-5"
-                >
-                <span
-                  v-if="formRarity === undefined"
-                  class="text-sm text-dimmed"
-                >
-                  えらんでね
-                </span>
+                <template v-if="formRarity === -1">
+                  <UBadge
+                    label="スペシャル"
+                    color="warning"
+                  />
+                </template>
+                <template v-else>
+                  <img
+                    v-for="i in formRarity"
+                    :key="`list-rarity-${formRarity}-star-${i}`"
+                    src="/star_icon.png"
+                    alt="★"
+                    class="w-5 h-5"
+                  >
+                  <span
+                    v-if="formRarity === undefined"
+                    class="text-sm text-dimmed"
+                  >
+                    えらんでね
+                  </span>
+                </template>
               </div>
             </template>
           </USelect>
@@ -229,6 +245,7 @@ watch(formFilterBrandType, (value) => {
             { label: 'ブランド', value: 'brand' },
             { label: 'タイプ', value: 'type' },
             { label: 'レアリティ', value: 'rarity' },
+            { label: 'バージョン', value: 'pool' },
           ]"
         />
       </UFieldGroup>
