@@ -1,7 +1,7 @@
 <script setup lang="ts">
-const database = useDatabase()
-const runtimeConfig = useRuntimeConfig()
 const toast = useToast()
+const runtimeConfig = useRuntimeConfig()
+const { dropDB } = useIndexedDB()
 
 const openDataTransferModal = ref(false)
 const openRightsModal = ref(false)
@@ -9,15 +9,10 @@ const openPrivacyPolicy = ref(false)
 const showDeleteButton = ref(false)
 const openDeleteModal = ref(false)
 
-const deleteDB = () => {
-  const request = window.indexedDB.deleteDatabase(runtimeConfig.public.dbName)
+const deleteDB = async () => {
   openDeleteModal.value = false
-  request.addEventListener('success', () => {
-    toast.add({ title: 'データベースを削除しました' })
-    database.value.db = null
-    database.value.coordinates = []
-    database.value.collections = []
-  })
+  await dropDB()
+  toast.add({ title: 'データベースを削除しました' })
 }
 </script>
 

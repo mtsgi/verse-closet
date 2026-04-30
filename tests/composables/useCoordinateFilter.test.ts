@@ -1,0 +1,178 @@
+import { describe, it, expect } from 'vitest'
+import { filterCoordinates, sortCoordinates } from '../../composables/useCoordinateFilter'
+import type { VerseCoordinate } from '../../composables/useDatabase'
+
+/** テスト用のコーデオブジェクトを生成するヘルパー */
+function makeCoordinate(override: Partial<VerseCoordinate> = {}): VerseCoordinate {
+  return {
+    name: 'テストコーデ',
+    rarity: 1,
+    brandName: 'ブランドA',
+    pool: [],
+    itemType: ['tops', 'bottoms', 'shoes'],
+    items: {
+      accessory: { type: 'accessory', number: 0, bp: 0, id: '', name: '' },
+      onepiece: { type: 'onepiece', number: 0, bp: 0, id: '', name: '' },
+      tops: { type: 'tops', number: 0, bp: 0, id: '', name: '' },
+      bottoms: { type: 'bottoms', number: 0, bp: 0, id: '', name: '' },
+      shoes: { type: 'shoes', number: 0, bp: 0, id: '', name: '' },
+    },
+    tags: [],
+    memo: '',
+    ...override,
+  }
+}
+
+describe('filterCoordinates', () => {
+  it('フィルターなしの場合は全件返す', () => {
+    const coords = [makeCoordinate({ name: 'コーデA' }), makeCoordinate({ name: 'コーデB' })]
+    expect(filterCoordinates(coords, {})).toHaveLength(2)
+  })
+
+  it('キーワードで名前の部分一致フィルタリングができる', () => {
+    const coords = [
+      makeCoordinate({ name: 'サマーコーデ' }),
+      makeCoordinate({ name: 'ウィンターコーデ' }),
+      makeCoordinate({ name: 'サマードレス' }),
+    ]
+    const result = filterCoordinates(coords, { word: 'サマー' })
+    expect(result).toHaveLength(2)
+    expect(result.map(c => c.name)).toEqual(['サマーコーデ', 'サマードレス'])
+  })
+
+  it('ブランドで完全一致フィルタリングができる', () => {
+    const coords = [
+      makeCoordinate({ name: 'コーデA', brandName: 'ブランドA' }),
+      makeCoordinate({ name: 'コーデB', brandName: 'ブランドB' }),
+      makeCoordinate({ name: 'コーデC', brandName: 'ブランドA' }),
+    ]
+    const result = filterCoordinates(coords, { brandName: 'ブランドA' })
+    expect(result).toHaveLength(2)
+    expect(result.every(c => c.brandName === 'ブランドA')).toBe(true)
+  })
+
+  it('カードプールでフィルタリングができる', () => {
+    const coords = [
+      makeCoordinate({ name: 'コーデA', pool: ['プールX', 'プールY'] }),
+      makeCoordinate({ name: 'コーデB', pool: ['プールY'] }),
+      makeCoordinate({ name: 'コーデC', pool: ['プールZ'] }),
+    ]
+    const result = filterCoordinates(coords, { cardPool: 'プールY' })
+    expect(result).toHaveLength(2)
+    expect(result.map(c => c.name)).toEqual(['コーデA', 'コーデB'])
+  })
+
+  it('レアリティでフィルタリングができる', () => {
+    const coords = [
+      makeCoordinate({ name: 'コーデA', rarity: 1 }),
+      makeCoordinate({ name: 'コーデB', rarity: 2 }),
+      makeCoordinate({ name: 'コーデC', rarity: 1 }),
+    ]
+    const result = filterCoordinates(coords, { rarity: 1 })
+    expect(result).toHaveLength(2)
+    expect(result.every(c => c.rarity === 1)).toBe(true)
+  })
+
+  it('完了状態（フルコーデ）でフィルタリングができる', () => {
+    const completedCoord = makeCoordinate({
+      name: 'フルコーデ',
+      itemType: ['tops', 'bottoms'],
+      items: {
+        accessory: { type: 'accessory', number: 0, bp: 0, id: '', name: '' },
+        onepiece: { type: 'onepiece', number: 0, bp: 0, id: '', name: '' },
+        tops: { type: 'tops', number: 1, bp: 0, id: '', name: '' },
+        bottoms: { type: 'bottoms', number: 1, bp: 0, id: '', name: '' },
+        shoes: { type: 'shoes', number: 0, bp: 0, id: '', name: '' },
+      },
+    })
+    const incompleteCoord = makeCoordinate({
+      name: '未完成コーデ',
+      itemType: ['tops', 'bottoms'],
+      items: {
+        accessory: { type: 'accessory', number: 0, bp: 0, id: '', name: '' },
+        onepiece: { type: 'onepiece', number: 0, bp: 0, id: '', name: '' },
+        tops: { type: 'tops', number: 1, bp: 0, id: '', name: '' },
+        bottoms: { type: 'bottoms', number: 0, bp: 0, id: '', name: '' },
+        shoes: { type: 'shoes', number: 0, bp: 0, id: '', name: '' },
+      },
+    })
+
+    const result = filterCoordinates([completedCoord, incompleteCoord], { completed: true })
+    expect(result).toHaveLength(1)
+    expect(result[0]!.name).toBe('フルコーデ')
+
+    const incompleteResult = filterCoordinates([completedCoord, incompleteCoord], { completed: false })
+    expect(incompleteResult).toHaveLength(1)
+    expect(incompleteResult[0]!.name).toBe('未完成コーデ')
+  })
+
+  it('複数条件を組み合わせてフィルタリングができる', () => {
+    const coords = [
+      makeCoordinate({ name: 'サマーA', brandName: 'ブランドA', rarity: 1 }),
+      makeCoordinate({ name: 'サマーB', brandName: 'ブランドB', rarity: 1 }),
+      makeCoordinate({ name: 'ウィンターA', brandName: 'ブランドA', rarity: 2 }),
+    ]
+    const result = filterCoordinates(coords, { word: 'サマー', brandName: 'ブランドA' })
+    expect(result).toHaveLength(1)
+    expect(result[0]!.name).toBe('サマーA')
+  })
+})
+
+describe('sortCoordinates', () => {
+  it('名前の昇順でソートできる', () => {
+    const coords = [
+      makeCoordinate({ name: 'ウ' }),
+      makeCoordinate({ name: 'ア' }),
+      makeCoordinate({ name: 'イ' }),
+    ]
+    const result = sortCoordinates(coords, 'name', 'asc')
+    expect(result.map(c => c.name)).toEqual(['ウ', 'イ', 'ア'])
+  })
+
+  it('名前の降順でソートできる', () => {
+    const coords = [
+      makeCoordinate({ name: 'ウ' }),
+      makeCoordinate({ name: 'ア' }),
+      makeCoordinate({ name: 'イ' }),
+    ]
+    const result = sortCoordinates(coords, 'name', 'desc')
+    expect(result.map(c => c.name)).toEqual(['ア', 'イ', 'ウ'])
+  })
+
+  it('レアリティの昇順でソートできる', () => {
+    const coords = [
+      makeCoordinate({ name: 'C', rarity: 3 }),
+      makeCoordinate({ name: 'A', rarity: 1 }),
+      makeCoordinate({ name: 'B', rarity: 2 }),
+    ]
+    const result = sortCoordinates(coords, 'rarity', 'asc')
+    expect(result.map(c => c.rarity)).toEqual([3, 2, 1])
+  })
+
+  it('レアリティの降順でソートできる', () => {
+    const coords = [
+      makeCoordinate({ name: 'C', rarity: 3 }),
+      makeCoordinate({ name: 'A', rarity: 1 }),
+      makeCoordinate({ name: 'B', rarity: 2 }),
+    ]
+    const result = sortCoordinates(coords, 'rarity', 'desc')
+    expect(result.map(c => c.rarity)).toEqual([1, 2, 3])
+  })
+
+  it('ブランドリストの順にソートできる', () => {
+    const brandNameList = ['ブランドA', 'ブランドB', 'ブランドC']
+    const coords = [
+      makeCoordinate({ name: 'コーデC', brandName: 'ブランドC' }),
+      makeCoordinate({ name: 'コーデA', brandName: 'ブランドA' }),
+      makeCoordinate({ name: 'コーデB', brandName: 'ブランドB' }),
+    ]
+    const result = sortCoordinates(coords, 'brand', 'asc', brandNameList)
+    expect(result.map(c => c.brandName)).toEqual(['ブランドC', 'ブランドB', 'ブランドA'])
+  })
+
+  it('元の配列を変更しない（イミュータブル）', () => {
+    const coords = [makeCoordinate({ name: 'B' }), makeCoordinate({ name: 'A' })]
+    sortCoordinates(coords, 'name', 'asc')
+    expect(coords[0]!.name).toBe('B')
+  })
+})

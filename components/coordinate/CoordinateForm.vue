@@ -120,7 +120,7 @@ const update = () => {
       class="form-field"
       label="レアリティ"
     >
-      <UButtonGroup>
+      <UFieldGroup>
         <UButton
           v-for="num in [1, 2, 3, 4]"
           :key="`register-rarity-${num}`"
@@ -136,7 +136,7 @@ const update = () => {
             alt="★"
           >
         </UButton>
-      </UButtonGroup>
+      </UFieldGroup>
     </UFormField>
 
     <UFormField

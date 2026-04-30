@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { consola } from 'consola'
-
 const props = defineProps<{
   modelValue: boolean
   collection: VerseCollection
@@ -15,6 +13,7 @@ const emit = defineEmits<{
 
 const database = useDatabase()
 const toast = useToast()
+const { deleteCollection } = useCollectionsDB(database)
 
 /** 削除確認モーダルの表示状態 */
 const openDeleteModal = ref(false)
@@ -41,29 +40,17 @@ const collectionCoordinates = computed<VerseCoordinate[]>(() => {
   return result
 })
 
-const deleteItem = (key: string) => {
-  const db = database.value.db
-  if (!db) {
-    return
-  }
-  const transaction = db.transaction(['collections'], 'readwrite')
-  const objectStore = transaction.objectStore('collections')
-  const request = objectStore.delete(key)
-  request.addEventListener('success', () => {
-    toast.add({
-      title: 'コレクションをさくじょしました',
-    })
-    consola.success('IDBRequest<IDBValidKey> success')
+const deleteItem = async (key: string) => {
+  try {
+    await deleteCollection(key)
+    toast.add({ title: 'コレクションをさくじょしました' })
     emit('update-items')
     emit('close-modal')
-  })
-  request.addEventListener('error', () => {
-    toast.add({
-      title: 'エラーがはっせいしました',
-    })
-    consola.error('IDBRequest<IDBValidKey> error')
+  }
+  catch {
+    toast.add({ title: 'エラーがはっせいしました' })
     emit('error')
-  })
+  }
 }
 </script>
 

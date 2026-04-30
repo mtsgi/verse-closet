@@ -1,5 +1,5 @@
-/** `useDatabse` の中身 */
-interface DatabaseState {
+/** `useDatabase` の中身 */
+export interface DatabaseState {
   db: null | IDBDatabase
   coordinates: VerseCoordinate[]
   collections: VerseCollection[]

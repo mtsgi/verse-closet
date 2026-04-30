@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { consola } from 'consola'
-
 const props = defineProps<{
   modelValue: boolean
   coordinate: VerseCoordinate
@@ -15,6 +13,7 @@ const emit = defineEmits<{
 
 const database = useDatabase()
 const toast = useToast()
+const { updateCoordinateItem, deleteCoordinate } = useCoordinatesDB(database)
 
 /** 削除確認モーダルの表示状態 */
 const openDeleteModal = ref(false)
@@ -38,66 +37,28 @@ const imageURL = computed(() => {
 })
 
 /** アイテムの所持数を更新する */
-const updateItemNumber = (itemType: CoordinateItemType, value: boolean) => {
-  const db = database.value.db
-  if (!db) {
-    return
-  }
-  const transaction = db.transaction(['coordinates'], 'readwrite')
-  const objectStore = transaction.objectStore('coordinates')
-  // 複製する
-  const item: VerseCoordinate = {
-    ...props.coordinate,
-    tags: [...props.coordinate.tags],
-    pool: [...props.coordinate.pool],
-    itemType: [...props.coordinate.itemType],
-    items: {
-      tops: { ...props.coordinate.items.tops },
-      bottoms: { ...props.coordinate.items.bottoms },
-      onepiece: { ...props.coordinate.items.onepiece },
-      shoes: { ...props.coordinate.items.shoes },
-      accessory: { ...props.coordinate.items.accessory },
-    },
-  }
-  // 対象のアイテムの個数を更新する
-  item.items[itemType].number = value ? 1 : 0
-  const request = objectStore.put(item)
-  request.addEventListener('success', () => {
-    consola.success('IDBRequest<IDBValidKey> success')
+const updateItemNumber = async (itemType: CoordinateItemType, value: boolean) => {
+  try {
+    await updateCoordinateItem(props.coordinate.name, itemType, value)
     emit('update-items')
-  })
-  request.addEventListener('error', () => {
-    consola.error('IDBRequest<IDBValidKey> add error')
-    toast.add({
-      title: 'エラーが発生しました',
-    })
+  }
+  catch {
+    toast.add({ title: 'エラーが発生しました' })
     emit('close-modal')
-  })
+  }
 }
 
-const deleteItem = (key: string) => {
-  const db = database.value.db
-  if (!db) {
-    return
-  }
-  const transaction = db.transaction(['coordinates'], 'readwrite')
-  const objectStore = transaction.objectStore('coordinates')
-  const request = objectStore.delete(key)
-  request.addEventListener('success', () => {
-    toast.add({
-      title: 'コーデをさくじょしました',
-    })
-    consola.success('IDBRequest<undefined> success')
+const deleteItem = async (key: string) => {
+  try {
+    await deleteCoordinate(key)
+    toast.add({ title: 'コーデをさくじょしました' })
     emit('update-items')
     emit('close-modal')
-  })
-  request.addEventListener('error', () => {
-    toast.add({
-      title: 'エラーがはっせいしました',
-    })
-    consola.error('IDBRequest<undefined> error')
+  }
+  catch {
+    toast.add({ title: 'エラーがはっせいしました' })
     emit('error')
-  })
+  }
 }
 </script>
 
@@ -156,7 +117,7 @@ const deleteItem = (key: string) => {
           size="xl"
           :label="itemType"
           :model-value="props.coordinate.items[itemType].number > 0"
-          @update:model-value="(value) => updateItemNumber(itemType, value)"
+          @update:model-value="(value) => updateItemNumber(itemType, Boolean(value))"
         >
           <template #label>
             <CoordinateItemIcon

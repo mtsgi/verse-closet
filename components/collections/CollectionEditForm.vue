@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { consola } from 'consola'
-
 const database = useDatabase()
+const { updateCollection, renameCollection } = useCollectionsDB(database)
 
 const props = defineProps<{
   collection: VerseCollection
@@ -16,63 +15,21 @@ const toast = useToast()
 
 const form = ref<VerseCollection>({ ...props.collection })
 
-const editItem = (item: VerseCollection) => {
-  if (!database.value.db) {
-    return
+const editItem = async (item: VerseCollection) => {
+  try {
+    const nameChanged = props.collection.name !== item.name
+    if (nameChanged) {
+      await renameCollection(props.collection.name, item)
+    }
+    else {
+      await updateCollection(item)
+    }
+    toast.add({ title: 'コレクションをへんしゅうしました' })
+    emit('edit')
   }
-  // コレクション名の変更をチェック
-  const nameChanged = props.collection.name !== item.name
-  // console.log('nameChanged', nameChanged)
-  const transaction = database.value.db.transaction(['collections'], 'readwrite')
-  const objectStore = transaction.objectStore('collections')
-
-  if (nameChanged) {
-    // コレクションのなまえが変更されている場合はaddしてremove
-    const originalName = props.collection.name
-    const request = objectStore.add(item)
-    request.addEventListener('success', () => {
-      consola.success('IDBRequest<IDBValidKey> add success')
-      const request = objectStore.delete(originalName)
-      request.addEventListener('success', () => {
-        consola.success('IDBRequest<IDBValidKey> delete success')
-        toast.add({
-          title: 'コレクションをへんしゅうしました',
-        })
-        emit('edit')
-      })
-      request.addEventListener('error', () => {
-        consola.error('IDBRequest<IDBValidKey> add error')
-        toast.add({
-          title: 'エラーがはっせいしました',
-        })
-        emit('close')
-      })
-    })
-    request.addEventListener('error', () => {
-      consola.error('IDBRequest<IDBValidKey> add error')
-      toast.add({
-        title: 'エラーがはっせいしました',
-      })
-      emit('close')
-    })
-  }
-  else {
-    // コレクションのなまえが変更されていない場合はputする
-    const request = objectStore.put(item)
-    request.addEventListener('success', () => {
-      consola.success('IDBRequest<IDBValidKey> put success')
-      toast.add({
-        title: 'コレクションをへんしゅうしました',
-      })
-      emit('edit')
-    })
-    request.addEventListener('error', () => {
-      consola.error('IDBRequest<IDBValidKey> put error')
-      toast.add({
-        title: 'エラーがはっせいしました',
-      })
-      emit('close')
-    })
+  catch {
+    toast.add({ title: 'エラーがはっせいしました' })
+    emit('close')
   }
 }
 </script>

@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { consola } from 'consola'
-
 const database = useDatabase()
+const { addCollection } = useCollectionsDB(database)
 
 const emit = defineEmits<{
   (e: 'close'): void
@@ -18,31 +17,15 @@ const defaultCollection: VerseCollection = {
 
 const form = ref<VerseCollection>({ ...defaultCollection })
 
-const addCollection = (item: VerseCollection) => {
-  if (!database.value.db) {
-    return
+const onSubmit = async (item: VerseCollection) => {
+  try {
+    await addCollection(item)
+    toast.add({ title: 'コレクションをとうろくしました' })
   }
-  // 登録日時を現在日時にする
-  item.createdAt = new Date()
-  consola.log('item', item)
-
-  const transaction = database.value.db.transaction(['collections'], 'readwrite')
-  const objectStore = transaction.objectStore('collections')
-  const request = objectStore.add(item)
-  request.addEventListener('success', () => {
-    consola.success('IDBRequest<IDBValidKey> success')
-    toast.add({
-      title: 'コレクションをとうろくしました',
-    })
-    emit('close')
-  })
-  request.addEventListener('error', () => {
-    consola.error('IDBRequest<IDBValidKey> error')
-    toast.add({
-      title: 'コレクションをとうろくできませんでした',
-    })
-    emit('close')
-  })
+  catch {
+    toast.add({ title: 'コレクションをとうろくできませんでした' })
+  }
+  emit('close')
 }
 </script>
 
@@ -50,7 +33,7 @@ const addCollection = (item: VerseCollection) => {
   <div class="register">
     <CollectionForm
       v-model="form"
-      @update:model-value="addCollection"
+      @update:model-value="onSubmit"
       @cancel="emit('close')"
     >
       <template #update>

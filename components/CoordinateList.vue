@@ -7,83 +7,23 @@ const emit = defineEmits<{
 const database = useDatabase()
 const runtimeConfig = useRuntimeConfig()
 
-const formWord = ref<string>('')
-const formBrandName = ref<string>('')
-const formCardPool = ref<string>('')
-const formRarity = ref<number | undefined>()
-const formCompleted = ref<boolean | undefined>()
 const dispType = ref<'default' | 'compact' | 'gallery'>('default')
-const sortType = ref<'name' | 'brand' | 'rarity'>('name')
-const sortOrder = ref<'asc' | 'desc'>('desc')
 
-/** しぼりこみを1つでも使っているか？ */
-const filterUsing = computed<boolean>(() => {
-  return formBrandName.value !== ''
-    || formCardPool.value !== ''
-    || formRarity.value !== undefined
-    || formCompleted.value !== undefined
-})
-
-/** しぼりこみをすべて解除する */
-const clearFilter = () => {
-  formBrandName.value = ''
-  formCardPool.value = ''
-  formRarity.value = undefined
-  formCompleted.value = undefined
-}
-
-/** けんさく＆しぼりこみ＆ならびかえを適用したコーデリスト */
-const filteredCoordinates = computed<VerseCoordinate[]>(() => {
-  const result = database.value.coordinates.filter((coordinate) => {
-    let flag = true
-    // けんさくワード
-    if (flag && formWord.value !== '') {
-      flag = coordinate.name.includes(formWord.value)
-    }
-    // ブランド
-    if (flag && formBrandName.value !== '') {
-      flag = coordinate.brandName === formBrandName.value
-    }
-    // バージョン
-    if (flag && formCardPool.value !== '') {
-      flag = coordinate.pool.includes(formCardPool.value)
-    }
-    // レアリティ
-    if (flag && formRarity.value !== undefined) {
-      flag = coordinate.rarity === formRarity.value
-    }
-    // フルコーデ
-    if (flag && formCompleted.value !== undefined) {
-      const completed = coordinate.itemType.every((item) => {
-        return coordinate.items[item].number > 0
-      })
-      flag = completed === formCompleted.value
-    }
-
-    return flag
-  })
-
-  // ならびかえ
-  result.sort((a, b) => {
-    if (sortType.value === 'name') {
-      // NOTE: ひらがな・カタカナは同列になる
-      return a.name.localeCompare(b.name)
-    } else if (sortType.value === 'brand') {
-      // brandNameListに入っている順
-      return runtimeConfig.public.brandNameList.indexOf(a.brandName) -
-        runtimeConfig.public.brandNameList.indexOf(b.brandName)
-    } else if (sortType.value === 'rarity') {
-      return a.rarity - b.rarity
-    }
-    return 0
-  })
-
-  if (sortOrder.value === 'asc') {
-    result.reverse()
-  }
-
-  return result
-})
+const {
+  formWord,
+  formBrandName,
+  formCardPool,
+  formRarity,
+  formCompleted,
+  sortType,
+  sortOrder,
+  filterUsing,
+  clearFilter,
+  filteredCoordinates,
+} = useCoordinateFilter(
+  computed(() => database.value.coordinates),
+  { brandNameList: runtimeConfig.public.brandNameList },
+)
 </script>
 
 <template>
@@ -208,7 +148,7 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
 
     <!-- ならびかえと表示タイプ -->
     <div class="disp-menu">
-      <UButtonGroup>
+      <UFieldGroup>
         <UButton
           color="neutral"
           variant="outline"
@@ -223,11 +163,11 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
             { label: 'レアリティ', value: 'rarity' },
           ]"
         />
-      </UButtonGroup>
+      </UFieldGroup>
 
       <div class="separator" />
 
-      <UButtonGroup>
+      <UFieldGroup>
         <UButton
           :variant="dispType === 'default' ? 'solid' : 'outline'"
           icon="material-symbols:lists"
@@ -243,7 +183,7 @@ const filteredCoordinates = computed<VerseCoordinate[]>(() => {
           icon="material-symbols:grid-view-outline"
           @click="dispType = 'gallery'"
         />
-      </UButtonGroup>
+      </UFieldGroup>
     </div>
   </div>
 

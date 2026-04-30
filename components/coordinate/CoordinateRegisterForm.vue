@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { consola } from 'consola'
-
 const database = useDatabase()
+const { addCoordinate } = useCoordinatesDB(database)
 
 const emit = defineEmits<{
   (e: 'close'): void
@@ -35,29 +34,15 @@ const defaultCoordinate: VerseCoordinate = {
 
 const form = ref<VerseCoordinate>({ ...defaultCoordinate })
 
-const addCoordinate = (item: VerseCoordinate) => {
-  if (!database.value.db) {
-    return
+const onSubmit = async (item: VerseCoordinate) => {
+  try {
+    await addCoordinate(item)
+    toast.add({ title: 'コーデをとうろくしました' })
   }
-  console.log('item', item)
-
-  const transaction = database.value.db.transaction(['coordinates'], 'readwrite')
-  const objectStore = transaction.objectStore('coordinates')
-  const request = objectStore.add(item)
-  request.addEventListener('success', () => {
-    consola.success('IDBRequest<IDBValidKey> success')
-    toast.add({
-      title: 'コーデをとうろくしました',
-    })
-    emit('close')
-  })
-  request.addEventListener('error', () => {
-    consola.error('IDBRequest<IDBValidKey> error')
-    toast.add({
-      title: 'コーデをとうろくできませんでした',
-    })
-    emit('close')
-  })
+  catch {
+    toast.add({ title: 'コーデをとうろくできませんでした' })
+  }
+  emit('close')
 }
 </script>
 
@@ -65,7 +50,7 @@ const addCoordinate = (item: VerseCoordinate) => {
   <div class="register">
     <CoordinateForm
       v-model="form"
-      @update:model-value="addCoordinate"
+      @update:model-value="onSubmit"
       @cancel="emit('close')"
     >
       <template #update>
