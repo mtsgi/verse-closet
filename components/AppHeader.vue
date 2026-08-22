@@ -30,11 +30,14 @@ const onClose = () => {
 
     <div class="divider" />
 
-    <img
-      class="icon"
-      src="/icon.png"
-      alt="Verse Closet"
-    >
+    <h1 class="header-title">
+      <img
+        class="icon"
+        src="/icon.png"
+        alt="Verse Closet"
+      >
+      <span class="sr-only">Verse Closet</span>
+    </h1>
 
     <div class="divider" />
 
@@ -69,6 +72,15 @@ header {
 
   .divider {
     flex-grow: 1;
+  }
+
+  .header-title {
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .icon {

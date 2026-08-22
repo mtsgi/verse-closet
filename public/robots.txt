@@ -1,1 +1,4 @@
+User-agent: *
+Allow: /
 
+Sitemap: https://mtsgi.github.io/verse-closet/sitemap.xml
