@@ -24,19 +24,21 @@ const refreshAll = async () => {
       @update-items="refreshAll"
     />
 
-    <AppTabs v-model="tab" />
+    <main>
+      <AppTabs v-model="tab" />
 
-    <CoordinateList
-      v-if="tab === 'coordinates'"
-      @update-items="refreshAll"
-    />
+      <CoordinateList
+        v-if="tab === 'coordinates'"
+        @update-items="refreshAll"
+      />
 
-    <CollectionList
-      v-if="tab === 'collections'"
-      @update-items="refreshAll"
-    />
+      <CollectionList
+        v-if="tab === 'collections'"
+        @update-items="refreshAll"
+      />
 
-    <LoadingSkeleton v-if="database.db === null" />
+      <LoadingSkeleton v-if="database.db === null" />
+    </main>
   </UApp>
 </template>
 
