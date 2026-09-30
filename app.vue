@@ -39,12 +39,6 @@ const refreshAll = async () => {
 
       <LoadingSkeleton v-if="database.db === null" />
     </main>
-
-    <noscript>
-      <div class="noscript-message">
-      <p>Verse Closet はコーデアイテムかんりツールです。ご利用にはJavaScriptを有効にしてください。</p>
-      </div>
-    </noscript>
   </UApp>
 </template>
 
@@ -78,15 +72,6 @@ body {
 .modal {
   overflow: auto;
   max-height: 100%;
-}
-
-.noscript-message {
-  text-align: center;
-  padding: 1rem;
-  margin: 1rem;
-  background-color: #fff;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 @keyframes bgtexture {

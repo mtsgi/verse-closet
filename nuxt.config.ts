@@ -19,6 +19,7 @@ export default defineNuxtConfig({
         lang: 'ja',
       },
       title: 'Verse Closet',
+      noscript: [{ children: 'Verse Closet はコーデアイテムかんりツールです。ご利用にはJavaScriptを有効にしてください。' }],
       meta: [
         { name: 'description', content: 'コーデアイテムかんりツール' },
         { name: 'keywords', content: 'Verse Closet,コーデ管理,コレクション管理,PWA,アイテム管理' },
